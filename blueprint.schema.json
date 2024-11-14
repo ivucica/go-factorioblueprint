@@ -1,0 +1,319 @@
+{
+  "$id": "https://wiki.factorio.com/Blueprint_string_format",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Factorio Blueprint Format",
+  "type": "object",
+  "properties": {
+    "blueprint": { "$ref": "#/definitions/blueprint" },
+    "blueprint-book": {
+      "type": "object",
+      "properties": {
+        "item": { "type": "string", "enum": ["blueprint-book"] },
+        "label": { "type": "string" },
+        "label_color": { "$ref": "#/definitions/color" },
+        "blueprints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": { "type": "integer" },
+              "blueprint": { "$ref": "#/definitions/blueprint" }
+            },
+            "required": ["index", "blueprint"]
+          }
+        },
+        "active_index": { "type": "integer" },
+        "icons": { "type": "array", "items": { "$ref": "#/definitions/icon" } },
+        "description": { "type": "string" },
+        "version": { "type": "integer" }
+      },
+      "required": ["item", "blueprints", "version"]
+    }
+  },
+  "definitions": {
+    "blueprint": {
+        "type": "object",
+        "properties": {
+          "item": { "type": "string", "enum": ["blueprint"] },
+          "label": { "type": "string" },
+          "label_color": { "$ref": "#/definitions/color" },
+          "entities": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/entity" }
+          },
+          "tiles": { "type": "array", "items": { "$ref": "#/definitions/tile" } },
+          "icons": { "type": "array", "items": { "$ref": "#/definitions/icon" } },
+          "schedules": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/schedule" }
+          },
+          "description": { "type": "string" },
+          "snap-to-grid": { "$ref": "#/definitions/position" },
+          "absolute-snapping": { "type": "boolean" },
+          "position-relative-to-grid": { "$ref": "#/definitions/position" },
+          "version": { "type": "integer" }
+        },
+        "required": ["item", "entities", "icons", "version"]
+      },
+  
+    "icon": {
+      "type": "object",
+      "properties": {
+        "index": { "type": "integer" },
+        "signal": { "$ref": "#/definitions/signalID" }
+      },
+      "required": ["index", "signal"]
+    },
+    "signalID": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["item", "fluid", "virtual"] }
+      },
+      "required": ["name"]
+    },
+    "entity": {
+      "type": "object",
+      "properties": {
+        "entity_number": { "type": "integer" },
+        "name": { "type": "string" },
+        "position": { "$ref": "#/definitions/position" },
+        "direction": { "type": "integer" },
+        "orientation": { "type": "number" },
+        "connections": { "$ref": "#/definitions/connection" },
+        "neighbours": { "type": "array", "items": { "type": "integer" } },
+        "control_behavior": { "$ref": "#/definitions/controlBehavior" },
+        "items": { "$ref": "#/definitions/itemRequest" },
+        "recipe": { "type": "string" },
+        "bar": { "type": "integer" },
+        "ammo_inventory": { "$ref": "#/definitions/inventory" },
+        "trunk_inventory": { "$ref": "#/definitions/inventory" },
+        "inventory": { "$ref": "#/definitions/inventory" },
+        "infinity_settings": { "$ref": "#/definitions/infinitySettings" },
+        "type": { "type": "string", "enum": ["input", "output"] },
+        "input_priority": { "type": "string", "enum": ["right", "left"] },
+        "output_priority": { "type": "string", "enum": ["right", "left"] },
+        "filter": { "type": "string" },
+        "filters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/itemFilter" }
+        },
+        "filter_mode": { "type": "string", "enum": ["whitelist", "blacklist"] },
+        "override_stack_size": { "type": "integer" },
+        "drop_position": { "$ref": "#/definitions/position" },
+        "pickup_position": { "$ref": "#/definitions/position" },
+        "request_filters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/logisticFilter" }
+        },
+        "request_from_buffers": { "type": "boolean" },
+        "parameters": { "$ref": "#/definitions/speakerParameters" },
+        "alert_parameters": { "$ref": "#/definitions/speakerAlertParameters" },
+        "auto_launch": { "type": "boolean" },
+        "variation": { "type": "integer" },
+        "color": { "$ref": "#/definitions/color" },
+        "station": { "type": "string" },
+        "manual_trains_limit": { "type": "integer" },
+        "switch_state": { "type": "boolean" },
+        "tags": { "type": "object" }
+      },
+      "required": ["entity_number", "name", "position"]
+    },
+    "tile": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "position": { "$ref": "#/definitions/position" }
+      },
+      "required": ["name", "position"]
+    },
+    "position": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "required": ["x", "y"]
+    },
+    "connection": {
+      "type": "object",
+      "properties": {
+        "1": { "$ref": "#/definitions/connectionPoint" },
+        "2": { "$ref": "#/definitions/connectionPoint" }
+      }
+    },
+    "connectionPoint": {
+      "type": "object",
+      "properties": {
+        "red": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/connectionData" }
+        },
+        "green": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/connectionData" }
+        }
+      }
+    },
+    "connectionData": {
+      "type": "object",
+      "properties": {
+        "entity_id": { "type": "integer" },
+        "circuit_id": { "type": "integer" }
+      },
+      "required": ["entity_id"]
+    },
+    "itemRequest": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "itemFilter": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "index": { "type": "integer" }
+      },
+      "required": ["name", "index"]
+    },
+    "inventory": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/itemFilter" }
+        },
+        "bar": { "type": "integer" }
+      }
+    },
+    "infinitySettings": {
+      "type": "object",
+      "properties": {
+        "remove_unfiltered_items": { "type": "boolean" },
+        "filters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/infinityFilter" }
+        }
+      }
+    },
+    "infinityFilter": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "count": { "type": "integer" },
+        "mode": {
+          "type": "string",
+          "enum": ["at-least", "at-most", "exactly"]
+        },
+        "index": { "type": "integer" }
+      }
+    },
+    "logisticFilter": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "index": { "type": "integer" },
+        "count": { "type": "integer" }
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "properties": {
+        "schedule": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/scheduleRecord" }
+        },
+        "locomotives": { "type": "array", "items": { "type": "integer" } }
+      }
+    },
+    "scheduleRecord": {
+      "type": "object",
+      "properties": {
+        "station": { "type": "string" },
+        "wait_conditions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/waitCondition" }
+        }
+      }
+    },
+    "waitCondition": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "compare_type": { "type": "string", "enum": ["and", "or"] },
+        "ticks": { "type": "integer" }
+      }
+    },
+    "color": {
+      "type": "object",
+      "properties": {
+        "r": { "type": "number" },
+        "g": { "type": "number" },
+        "b": { "type": "number" },
+        "a": { "type": "number" }
+      },
+      "required": ["r", "g", "b"]
+    },
+    "controlBehavior": {
+      "type": "object",
+      "properties": {
+        "circuit_condition": { "$ref": "#/definitions/condition" },
+        "logistic_condition": { "$ref": "#/definitions/condition" },
+        "arithmetic_conditions": { "$ref": "#/definitions/arithmeticConditions" },
+        "decider_conditions": { "$ref": "#/definitions/deciderConditions" },
+        "filters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/itemFilter" }
+        },
+        "is_on": { "type": "boolean" }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "properties": {
+        "first_signal": { "$ref": "#/definitions/signalID" },
+        "second_signal": { "$ref": "#/definitions/signalID" },
+        "comparator": { "type": "string" },
+        "constant": { "type": "integer" }
+      }
+    },
+    "arithmeticConditions": {
+      "type": "object",
+      "properties": {
+        "first_signal": { "$ref": "#/definitions/signalID" },
+        "second_signal": { "$ref": "#/definitions/signalID" },
+        "operation": { "type": "string" },
+        "output_signal": { "$ref": "#/definitions/signalID" }
+      }
+    },
+    "deciderConditions": {
+      "type": "object",
+      "properties": {
+        "first_signal": { "$ref": "#/definitions/signalID" },
+        "second_signal": { "$ref": "#/definitions/signalID" },
+        "comparator": { "type": "string" },
+        "constant": { "type": "integer" },
+        "output_signal": { "$ref": "#/definitions/signalID" },
+        "copy_count_from_input": { "type": "boolean" }
+      }
+    },
+    "speakerParameters": {
+      "type": "object",
+      "properties": {
+        "playback_volume": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "playback_globally": { "type": "boolean" },
+        "allow_polyphony": { "type": "boolean" }
+      }
+    },
+    "speakerAlertParameters": {
+      "type": "object",
+      "properties": {
+        "show_alert": { "type": "boolean" },
+        "alert_message": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+package read_blueprint // badc0de.net/pkg/factorioblueprint/read_blueprint

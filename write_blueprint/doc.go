@@ -1,0 +1,1 @@
+package write_blueprint // badc0de.net/pkg/factorioblueprint/write_blueprint
