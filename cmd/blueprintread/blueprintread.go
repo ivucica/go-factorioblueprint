@@ -7,16 +7,19 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
+	"badc0de.net/pkg/factorioblueprint/asciiart_blueprint"
 	"badc0de.net/pkg/factorioblueprint/read_blueprint"
+
 	"gopkg.in/yaml.v3"
 )
 
 var (
 	file   = flag.String("file", "", "The file to read the blueprint from. If empty, uses stdin.")
-	format = flag.String("fmt", "json", "Format. raw_json (no processing after decompression), json (default, pretty print JSON), yaml.")
+	format = flag.String("fmt", "json", "Format. raw_json (no processing after decompression), json (default, pretty print JSON), yaml, asciiart (experimental and halfbroken).")
 )
 
 func init() {
@@ -79,6 +82,15 @@ func main() {
 		} else {
 			fmt.Printf("%s\n", b)
 		}
+	case "asciiart":
+		// Print out ASCII art of the tilemap. Just use 1x1 for now.
+		r := asciiart_blueprint.NewReader(m.Blueprint, 1, 1)
+		// Copy to stdout.
+		if _, err := io.Copy(os.Stdout, r); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to generate ASCII art: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println() // no newline from generated asciiart, so add one
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown format: %v\n", *format)
 		os.Exit(1)
