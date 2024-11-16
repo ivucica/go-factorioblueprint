@@ -5,30 +5,7 @@
   "type": "object",
   "properties": {
     "blueprint": { "$ref": "#/definitions/blueprint" },
-    "blueprint-book": {
-      "type": "object",
-      "properties": {
-        "item": { "type": "string", "enum": ["blueprint-book"] },
-        "label": { "type": "string" },
-        "label_color": { "$ref": "#/definitions/color" },
-        "blueprints": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "index": { "type": "integer" },
-              "blueprint": { "$ref": "#/definitions/blueprint" }
-            },
-            "required": ["index", "blueprint"]
-          }
-        },
-        "active_index": { "type": "integer" },
-        "icons": { "type": "array", "items": { "$ref": "#/definitions/icon" } },
-        "description": { "type": "string" },
-        "version": { "type": "integer" }
-      },
-      "required": ["item", "blueprints", "version"]
-    }
+    "blueprint-book": { "$ref": "#/definitions/blueprint-book" }
   },
   "definitions": {
     "blueprint": {
@@ -90,13 +67,70 @@
       },
       "required": ["item", "entities", "icons", "version"]
     },
+    "blueprint-book": {
+      "type": "object",
+      "description": "An object representing a Factorio blueprint book.",
+      "properties": {
+        "item": {
+          "type": "string",
+          "enum": ["blueprint-book"],
+          "description": "The name of the item; usually 'blueprint-book' in vanilla Factorio."
+        },
+        "label": {
+          "type": "string",
+          "description": "The user-defined name of the blueprint book."
+        },
+        "label_color": {
+          "$ref": "#/definitions/color",
+          "description": "The color assigned to the blueprint book's label."
+        },
+        "blueprints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "integer",
+                "description": "Index of the blueprint in the book, 0-based."
+              },
+              "blueprint": {
+                "$ref": "#/definitions/blueprint",
+                "description": "A blueprint object."
+              }
+            },
+            "required": ["index", "blueprint"],
+            "description": "An array containing the blueprints included in the book."
+          },
+          "description": "The content of the blueprint book."
+        },
+        "active_index": {
+          "type": "integer",
+          "description": "Index of the currently selected blueprint, 0-based."
+        },
+        "icons": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/icon" },
+          "description": "Icons set by the user for the blueprint book."
+        },
+        "description": {
+          "type": "string",
+          "description": "An optional description of the blueprint book."
+        },
+        "version": {
+          "type": "integer",
+          "description": "The game version when the blueprint book was created."
+        }
+      },
+      "required": ["item", "blueprints", "version"]
+    },
     "icon": {
       "type": "object",
       "description": "An icon representing an item, fluid, or virtual signal.",
       "properties": {
         "index": {
           "type": "integer",
-          "description": "The 1-based index of the icon."
+          "description": "The 1-based index of the icon.",
+          "minimum": 1
         },
         "signal": {
           "$ref": "#/definitions/signalID",
@@ -127,67 +161,154 @@
       "properties": {
         "entity_number": {
           "type": "integer",
-          "description": "A unique identifier for the entity within the blueprint."
+          "description": "Index of the entity, 1-based.",
+          "minimum": 1
         },
         "name": {
           "type": "string",
-          "description": "The prototype name of the entity."
+          "description": "Prototype name of the entity (e.g., \"offshore-pump\")."
         },
         "position": {
           "$ref": "#/definitions/position",
-          "description": "The position of the entity on the blueprint grid."
+          "description": "Position of the entity within the blueprint."
         },
         "direction": {
           "type": "integer",
-          "description": "The direction the entity is facing."
+          "description": "Direction of the entity, uint (optional)."
         },
         "orientation": {
           "type": "number",
-          "description": "The orientation of the entity, ranging from 0 to 1."
+          "description": "Orientation of cargo wagon or locomotive, value 0 to 1 (optional).",
+          "minimum": 0,
+          "maximum": 1
         },
         "connections": {
           "$ref": "#/definitions/connection",
-          "description": "Circuit connections made by the entity."
+          "description": "Circuit connections (optional)."
         },
         "neighbours": {
           "type": "array",
           "items": { "type": "integer" },
-          "description": "Copper wire connections to other entities."
+          "description": "Copper wire connections, array of entity_numbers (optional)."
         },
-        "control_behavior": { "$ref": "#/definitions/controlBehavior" },
-        "items": { "$ref": "#/definitions/itemRequest" },
-        "recipe": { "type": "string" },
-        "bar": { "type": "integer" },
-        "ammo_inventory": { "$ref": "#/definitions/inventory" },
-        "trunk_inventory": { "$ref": "#/definitions/inventory" },
-        "inventory": { "$ref": "#/definitions/inventory" },
-        "infinity_settings": { "$ref": "#/definitions/infinitySettings" },
-        "type": { "type": "string", "enum": ["input", "output"] },
-        "input_priority": { "type": "string", "enum": ["right", "left"] },
-        "output_priority": { "type": "string", "enum": ["right", "left"] },
-        "filter": { "type": "string" },
+        "control_behavior": {
+          "$ref": "#/definitions/controlBehavior",
+          "description": "Control behavior of this entity (optional)."
+        },
+        "items": {
+          "$ref": "#/definitions/itemRequest",
+          "description": "Item requests by this entity (optional)."
+        },
+        "recipe": {
+          "type": "string",
+          "description": "Name of the recipe prototype this assembling machine is set to (optional)."
+        },
+        "bar": {
+          "type": "integer",
+          "description": "Index of the first inaccessible item slot due to limiting with the red \"bar\" (optional)."
+        },
+        "ammo_inventory": {
+          "$ref": "#/definitions/inventory",
+          "description": "Ammo inventory of an entity (e.g., Spidertron) (optional)."
+        },
+        "trunk_inventory": {
+          "$ref": "#/definitions/inventory",
+          "description": "Boot/Luggage inventory of an entity (e.g., storage inventory of a Spidertron) (optional)."
+        },
+        "inventory": {
+          "$ref": "#/definitions/inventory",
+          "description": "Cargo wagon inventory configuration (optional)."
+        },
+        "infinity_settings": {
+          "$ref": "#/definitions/infinitySettings",
+          "description": "Used by InfinityContainer (optional)."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["input", "output"],
+          "description": "Type of the underground belt or loader (optional)."
+        },
+        "input_priority": {
+          "type": "string",
+          "enum": ["right", "left"],
+          "description": "Input priority of the splitter (optional)."
+        },
+        "output_priority": {
+          "type": "string",
+          "enum": ["right", "left"],
+          "description": "Output priority of the splitter (optional)."
+        },
+        "filter": {
+          "type": "string",
+          "description": "Filter of the splitter; name of the item prototype (optional)."
+        },
         "filters": {
           "type": "array",
-          "items": { "$ref": "#/definitions/itemFilter" }
+          "items": { "$ref": "#/definitions/itemFilter" },
+          "description": "Filters of the filter inserter or loader (optional)."
         },
-        "filter_mode": { "type": "string", "enum": ["whitelist", "blacklist"] },
-        "override_stack_size": { "type": "integer" },
-        "drop_position": { "$ref": "#/definitions/position" },
-        "pickup_position": { "$ref": "#/definitions/position" },
+        "filter_mode": {
+          "type": "string",
+          "enum": ["whitelist", "blacklist"],
+          "description": "Filter mode of the filter inserter (optional)."
+        },
+        "override_stack_size": {
+          "type": "integer",
+          "description": "Stack size the inserter is set to (optional)."
+        },
+        "drop_position": {
+          "$ref": "#/definitions/position",
+          "description": "Drop position the inserter is set to (optional)."
+        },
+        "pickup_position": {
+          "$ref": "#/definitions/position",
+          "description": "Pickup position the inserter is set to (optional)."
+        },
         "request_filters": {
           "type": "array",
-          "items": { "$ref": "#/definitions/logisticFilter" }
+          "items": { "$ref": "#/definitions/logisticFilter" },
+          "description": "Used by LogisticContainer; array of logistic filters (optional)."
         },
-        "request_from_buffers": { "type": "boolean" },
-        "parameters": { "$ref": "#/definitions/speakerParameters" },
-        "alert_parameters": { "$ref": "#/definitions/speakerAlertParameters" },
-        "auto_launch": { "type": "boolean" },
-        "variation": { "type": "integer" },
-        "color": { "$ref": "#/definitions/color" },
-        "station": { "type": "string" },
-        "manual_trains_limit": { "type": "integer" },
-        "switch_state": { "type": "boolean" },
-        "tags": { "type": "object" }
+        "request_from_buffers": {
+          "type": "boolean",
+          "description": "Whether the requester chest can request from buffer chests (optional)."
+        },
+        "parameters": {
+          "$ref": "#/definitions/speakerParameters",
+          "description": "Used by Programmable Speaker (optional)."
+        },
+        "alert_parameters": {
+          "$ref": "#/definitions/speakerAlertParameters",
+          "description": "Used by Programmable Speaker (optional)."
+        },
+        "auto_launch": {
+          "type": "boolean",
+          "description": "Used by the rocket silo; whether auto launch is enabled (optional)."
+        },
+        "variation": {
+          "type": "integer",
+          "description": "Used by SimpleEntityWithForce or SimpleEntityWithOwner (optional)."
+        },
+        "color": {
+          "$ref": "#/definitions/color",
+          "description": "Color of the entity (optional)."
+        },
+        "station": {
+          "type": "string",
+          "description": "Name of the train station (optional)."
+        },
+        "manual_trains_limit": {
+          "type": "integer",
+          "description": "Manually set train limit of the train station (optional)."
+        },
+        "switch_state": {
+          "type": "boolean",
+          "description": "Current state of the power switch (optional)."
+        },
+        "tags": {
+          "type": "object",
+          "description": "Dictionary of arbitrary data (optional)."
+        }
       },
       "required": ["entity_number", "name", "position"]
     },
@@ -257,7 +378,8 @@
       "properties": {
         "entity_id": {
           "type": "integer",
-          "description": "Entity number of the connected entity."
+          "description": "Entity number of the connected entity.",
+          "minimum": 1
         },
         "circuit_id": {
           "type": "integer",
@@ -416,19 +538,27 @@
       "properties": {
         "r": {
           "type": "number",
-          "description": "Red component (0 to 1)."
+          "description": "Red component (0 to 1).",
+          "minimum": 0,
+          "maximum": 1
         },
         "g": {
           "type": "number",
-          "description": "Green component (0 to 1)."
+          "description": "Green component (0 to 1).",
+          "minimum": 0,
+          "maximum": 1
         },
         "b": {
           "type": "number",
-          "description": "Blue component (0 to 1)."
+          "description": "Blue component (0 to 1).",
+          "minimum": 0,
+          "maximum": 1
         },
         "a": {
           "type": "number",
-          "description": "Alpha (transparency) component (0 to 1)."
+          "description": "Alpha (transparency) component (0 to 1).",
+          "minimum": 0,
+          "maximum": 1
         }
       },
       "required": ["r", "g", "b"]
