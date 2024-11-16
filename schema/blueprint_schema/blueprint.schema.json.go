@@ -61,51 +61,53 @@ type Blueprint struct {
 	Version int `json:"version" yaml:"version" mapstructure:"version"`
 }
 
+// An object representing a Factorio blueprint book.
+type BlueprintBook struct {
+	// Index of the currently selected blueprint, 0-based.
+	ActiveIndex *int `json:"active_index,omitempty" yaml:"active_index,omitempty" mapstructure:"active_index,omitempty"`
+
+	// The content of the blueprint book.
+	Blueprints []BlueprintBookBlueprintsElem `json:"blueprints" yaml:"blueprints" mapstructure:"blueprints"`
+
+	// An optional description of the blueprint book.
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+
+	// Icons set by the user for the blueprint book.
+	Icons []Icon `json:"icons,omitempty" yaml:"icons,omitempty" mapstructure:"icons,omitempty"`
+
+	// The name of the item; usually 'blueprint-book' in vanilla Factorio.
+	Item BlueprintBookItem `json:"item" yaml:"item" mapstructure:"item"`
+
+	// The user-defined name of the blueprint book.
+	Label *string `json:"label,omitempty" yaml:"label,omitempty" mapstructure:"label,omitempty"`
+
+	// The color assigned to the blueprint book's label.
+	LabelColor *Color `json:"label_color,omitempty" yaml:"label_color,omitempty" mapstructure:"label_color,omitempty"`
+
+	// The game version when the blueprint book was created.
+	Version int `json:"version" yaml:"version" mapstructure:"version"`
+}
+
+// An array containing the blueprints included in the book.
+type BlueprintBookBlueprintsElem struct {
+	// A blueprint object.
+	Blueprint Blueprint `json:"blueprint" yaml:"blueprint" mapstructure:"blueprint"`
+
+	// Index of the blueprint in the book, 0-based.
+	Index int `json:"index" yaml:"index" mapstructure:"index"`
+}
+
+type BlueprintBookItem string
+
+const BlueprintBookItemBlueprintBook BlueprintBookItem = "blueprint-book"
+
 type BlueprintSchemaJSON struct {
 	// Blueprint corresponds to the JSON schema field "blueprint".
 	Blueprint *Blueprint `json:"blueprint,omitempty" yaml:"blueprint,omitempty" mapstructure:"blueprint,omitempty"`
 
 	// BlueprintBook corresponds to the JSON schema field "blueprint-book".
-	BlueprintBook *BlueprintSchemaJSONBlueprintBook `json:"blueprint-book,omitempty" yaml:"blueprint-book,omitempty" mapstructure:"blueprint-book,omitempty"`
+	BlueprintBook *BlueprintBook `json:"blueprint-book,omitempty" yaml:"blueprint-book,omitempty" mapstructure:"blueprint-book,omitempty"`
 }
-
-type BlueprintSchemaJSONBlueprintBook struct {
-	// ActiveIndex corresponds to the JSON schema field "active_index".
-	ActiveIndex *int `json:"active_index,omitempty" yaml:"active_index,omitempty" mapstructure:"active_index,omitempty"`
-
-	// Blueprints corresponds to the JSON schema field "blueprints".
-	Blueprints []BlueprintSchemaJSONBlueprintBookBlueprintsElem `json:"blueprints" yaml:"blueprints" mapstructure:"blueprints"`
-
-	// Description corresponds to the JSON schema field "description".
-	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
-
-	// Icons corresponds to the JSON schema field "icons".
-	Icons []Icon `json:"icons,omitempty" yaml:"icons,omitempty" mapstructure:"icons,omitempty"`
-
-	// Item corresponds to the JSON schema field "item".
-	Item BlueprintSchemaJSONBlueprintBookItem `json:"item" yaml:"item" mapstructure:"item"`
-
-	// Label corresponds to the JSON schema field "label".
-	Label *string `json:"label,omitempty" yaml:"label,omitempty" mapstructure:"label,omitempty"`
-
-	// LabelColor corresponds to the JSON schema field "label_color".
-	LabelColor *Color `json:"label_color,omitempty" yaml:"label_color,omitempty" mapstructure:"label_color,omitempty"`
-
-	// Version corresponds to the JSON schema field "version".
-	Version int `json:"version" yaml:"version" mapstructure:"version"`
-}
-
-type BlueprintSchemaJSONBlueprintBookBlueprintsElem struct {
-	// Blueprint corresponds to the JSON schema field "blueprint".
-	Blueprint Blueprint `json:"blueprint" yaml:"blueprint" mapstructure:"blueprint"`
-
-	// Index corresponds to the JSON schema field "index".
-	Index int `json:"index" yaml:"index" mapstructure:"index"`
-}
-
-type BlueprintSchemaJSONBlueprintBookItem string
-
-const BlueprintSchemaJSONBlueprintBookItemBlueprintBook BlueprintSchemaJSONBlueprintBookItem = "blueprint-book"
 
 // A color with RGBA components.
 type Color struct {
@@ -208,109 +210,111 @@ type DeciderConditions struct {
 
 // An entity placed within the blueprint.
 type Entity struct {
-	// AlertParameters corresponds to the JSON schema field "alert_parameters".
+	// Used by Programmable Speaker (optional).
 	AlertParameters *SpeakerAlertParameters `json:"alert_parameters,omitempty" yaml:"alert_parameters,omitempty" mapstructure:"alert_parameters,omitempty"`
 
-	// AmmoInventory corresponds to the JSON schema field "ammo_inventory".
+	// Ammo inventory of an entity (e.g., Spidertron) (optional).
 	AmmoInventory *Inventory `json:"ammo_inventory,omitempty" yaml:"ammo_inventory,omitempty" mapstructure:"ammo_inventory,omitempty"`
 
-	// AutoLaunch corresponds to the JSON schema field "auto_launch".
+	// Used by the rocket silo; whether auto launch is enabled (optional).
 	AutoLaunch *bool `json:"auto_launch,omitempty" yaml:"auto_launch,omitempty" mapstructure:"auto_launch,omitempty"`
 
-	// Bar corresponds to the JSON schema field "bar".
+	// Index of the first inaccessible item slot due to limiting with the red "bar"
+	// (optional).
 	Bar *int `json:"bar,omitempty" yaml:"bar,omitempty" mapstructure:"bar,omitempty"`
 
-	// Color corresponds to the JSON schema field "color".
+	// Color of the entity (optional).
 	Color *Color `json:"color,omitempty" yaml:"color,omitempty" mapstructure:"color,omitempty"`
 
-	// Circuit connections made by the entity.
+	// Circuit connections (optional).
 	Connections *Connection `json:"connections,omitempty" yaml:"connections,omitempty" mapstructure:"connections,omitempty"`
 
-	// ControlBehavior corresponds to the JSON schema field "control_behavior".
+	// Control behavior of this entity (optional).
 	ControlBehavior *ControlBehavior `json:"control_behavior,omitempty" yaml:"control_behavior,omitempty" mapstructure:"control_behavior,omitempty"`
 
-	// The direction the entity is facing.
+	// Direction of the entity, uint (optional).
 	Direction *int `json:"direction,omitempty" yaml:"direction,omitempty" mapstructure:"direction,omitempty"`
 
-	// DropPosition corresponds to the JSON schema field "drop_position".
+	// Drop position the inserter is set to (optional).
 	DropPosition *Position `json:"drop_position,omitempty" yaml:"drop_position,omitempty" mapstructure:"drop_position,omitempty"`
 
-	// A unique identifier for the entity within the blueprint.
+	// Index of the entity, 1-based.
 	EntityNumber int `json:"entity_number" yaml:"entity_number" mapstructure:"entity_number"`
 
-	// Filter corresponds to the JSON schema field "filter".
+	// Filter of the splitter; name of the item prototype (optional).
 	Filter *string `json:"filter,omitempty" yaml:"filter,omitempty" mapstructure:"filter,omitempty"`
 
-	// FilterMode corresponds to the JSON schema field "filter_mode".
+	// Filter mode of the filter inserter (optional).
 	FilterMode *EntityFilterMode `json:"filter_mode,omitempty" yaml:"filter_mode,omitempty" mapstructure:"filter_mode,omitempty"`
 
-	// Filters corresponds to the JSON schema field "filters".
+	// Filters of the filter inserter or loader (optional).
 	Filters []ItemFilter `json:"filters,omitempty" yaml:"filters,omitempty" mapstructure:"filters,omitempty"`
 
-	// InfinitySettings corresponds to the JSON schema field "infinity_settings".
+	// Used by InfinityContainer (optional).
 	InfinitySettings *InfinitySettings `json:"infinity_settings,omitempty" yaml:"infinity_settings,omitempty" mapstructure:"infinity_settings,omitempty"`
 
-	// InputPriority corresponds to the JSON schema field "input_priority".
+	// Input priority of the splitter (optional).
 	InputPriority *EntityInputPriority `json:"input_priority,omitempty" yaml:"input_priority,omitempty" mapstructure:"input_priority,omitempty"`
 
-	// Inventory corresponds to the JSON schema field "inventory".
+	// Cargo wagon inventory configuration (optional).
 	Inventory *Inventory `json:"inventory,omitempty" yaml:"inventory,omitempty" mapstructure:"inventory,omitempty"`
 
-	// Items corresponds to the JSON schema field "items".
+	// Item requests by this entity (optional).
 	Items ItemRequest `json:"items,omitempty" yaml:"items,omitempty" mapstructure:"items,omitempty"`
 
-	// ManualTrainsLimit corresponds to the JSON schema field "manual_trains_limit".
+	// Manually set train limit of the train station (optional).
 	ManualTrainsLimit *int `json:"manual_trains_limit,omitempty" yaml:"manual_trains_limit,omitempty" mapstructure:"manual_trains_limit,omitempty"`
 
-	// The prototype name of the entity.
+	// Prototype name of the entity (e.g., "offshore-pump").
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 
-	// Copper wire connections to other entities.
+	// Copper wire connections, array of entity_numbers (optional).
 	Neighbours []int `json:"neighbours,omitempty" yaml:"neighbours,omitempty" mapstructure:"neighbours,omitempty"`
 
-	// The orientation of the entity, ranging from 0 to 1.
+	// Orientation of cargo wagon or locomotive, value 0 to 1 (optional).
 	Orientation *float64 `json:"orientation,omitempty" yaml:"orientation,omitempty" mapstructure:"orientation,omitempty"`
 
-	// OutputPriority corresponds to the JSON schema field "output_priority".
+	// Output priority of the splitter (optional).
 	OutputPriority *EntityOutputPriority `json:"output_priority,omitempty" yaml:"output_priority,omitempty" mapstructure:"output_priority,omitempty"`
 
-	// OverrideStackSize corresponds to the JSON schema field "override_stack_size".
+	// Stack size the inserter is set to (optional).
 	OverrideStackSize *int `json:"override_stack_size,omitempty" yaml:"override_stack_size,omitempty" mapstructure:"override_stack_size,omitempty"`
 
-	// Parameters corresponds to the JSON schema field "parameters".
+	// Used by Programmable Speaker (optional).
 	Parameters *SpeakerParameters `json:"parameters,omitempty" yaml:"parameters,omitempty" mapstructure:"parameters,omitempty"`
 
-	// PickupPosition corresponds to the JSON schema field "pickup_position".
+	// Pickup position the inserter is set to (optional).
 	PickupPosition *Position `json:"pickup_position,omitempty" yaml:"pickup_position,omitempty" mapstructure:"pickup_position,omitempty"`
 
-	// The position of the entity on the blueprint grid.
+	// Position of the entity within the blueprint.
 	Position Position `json:"position" yaml:"position" mapstructure:"position"`
 
-	// Recipe corresponds to the JSON schema field "recipe".
+	// Name of the recipe prototype this assembling machine is set to (optional).
 	Recipe *string `json:"recipe,omitempty" yaml:"recipe,omitempty" mapstructure:"recipe,omitempty"`
 
-	// RequestFilters corresponds to the JSON schema field "request_filters".
+	// Used by LogisticContainer; array of logistic filters (optional).
 	RequestFilters []LogisticFilter `json:"request_filters,omitempty" yaml:"request_filters,omitempty" mapstructure:"request_filters,omitempty"`
 
-	// RequestFromBuffers corresponds to the JSON schema field "request_from_buffers".
+	// Whether the requester chest can request from buffer chests (optional).
 	RequestFromBuffers *bool `json:"request_from_buffers,omitempty" yaml:"request_from_buffers,omitempty" mapstructure:"request_from_buffers,omitempty"`
 
-	// Station corresponds to the JSON schema field "station".
+	// Name of the train station (optional).
 	Station *string `json:"station,omitempty" yaml:"station,omitempty" mapstructure:"station,omitempty"`
 
-	// SwitchState corresponds to the JSON schema field "switch_state".
+	// Current state of the power switch (optional).
 	SwitchState *bool `json:"switch_state,omitempty" yaml:"switch_state,omitempty" mapstructure:"switch_state,omitempty"`
 
-	// Tags corresponds to the JSON schema field "tags".
+	// Dictionary of arbitrary data (optional).
 	Tags EntityTags `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
-	// TrunkInventory corresponds to the JSON schema field "trunk_inventory".
+	// Boot/Luggage inventory of an entity (e.g., storage inventory of a Spidertron)
+	// (optional).
 	TrunkInventory *Inventory `json:"trunk_inventory,omitempty" yaml:"trunk_inventory,omitempty" mapstructure:"trunk_inventory,omitempty"`
 
-	// Type corresponds to the JSON schema field "type".
+	// Type of the underground belt or loader (optional).
 	Type *EntityType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
 
-	// Variation corresponds to the JSON schema field "variation".
+	// Used by SimpleEntityWithForce or SimpleEntityWithOwner (optional).
 	Variation *int `json:"variation,omitempty" yaml:"variation,omitempty" mapstructure:"variation,omitempty"`
 }
 
@@ -329,6 +333,7 @@ type EntityOutputPriority string
 const EntityOutputPriorityLeft EntityOutputPriority = "left"
 const EntityOutputPriorityRight EntityOutputPriority = "right"
 
+// Dictionary of arbitrary data (optional).
 type EntityTags map[string]interface{}
 
 type EntityType string
@@ -1165,90 +1170,90 @@ func (j *Blueprint) UnmarshalYAML(value *yaml.Node) error {
 const SignalIDTypeFluid SignalIDType = "fluid"
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *BlueprintSchemaJSONBlueprintBookBlueprintsElem) UnmarshalJSON(b []byte) error {
+func (j *BlueprintBookBlueprintsElem) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
 	if v, ok := raw["blueprint"]; !ok || v == nil {
-		return fmt.Errorf("field blueprint in BlueprintSchemaJSONBlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field blueprint in BlueprintBookBlueprintsElem: required")
 	}
 	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in BlueprintSchemaJSONBlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field index in BlueprintBookBlueprintsElem: required")
 	}
-	type Plain BlueprintSchemaJSONBlueprintBookBlueprintsElem
+	type Plain BlueprintBookBlueprintsElem
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	*j = BlueprintSchemaJSONBlueprintBookBlueprintsElem(plain)
+	*j = BlueprintBookBlueprintsElem(plain)
 	return nil
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *BlueprintSchemaJSONBlueprintBookBlueprintsElem) UnmarshalYAML(value *yaml.Node) error {
+func (j *BlueprintBookBlueprintsElem) UnmarshalYAML(value *yaml.Node) error {
 	var raw map[string]interface{}
 	if err := value.Decode(&raw); err != nil {
 		return err
 	}
 	if v, ok := raw["blueprint"]; !ok || v == nil {
-		return fmt.Errorf("field blueprint in BlueprintSchemaJSONBlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field blueprint in BlueprintBookBlueprintsElem: required")
 	}
 	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in BlueprintSchemaJSONBlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field index in BlueprintBookBlueprintsElem: required")
 	}
-	type Plain BlueprintSchemaJSONBlueprintBookBlueprintsElem
+	type Plain BlueprintBookBlueprintsElem
 	var plain Plain
 	if err := value.Decode(&plain); err != nil {
 		return err
 	}
-	*j = BlueprintSchemaJSONBlueprintBookBlueprintsElem(plain)
+	*j = BlueprintBookBlueprintsElem(plain)
 	return nil
 }
 
 const SignalIDTypeItem SignalIDType = "item"
 
-var enumValues_BlueprintSchemaJSONBlueprintBookItem = []interface{}{
+var enumValues_BlueprintBookItem = []interface{}{
 	"blueprint-book",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *BlueprintSchemaJSONBlueprintBookItem) UnmarshalJSON(b []byte) error {
+func (j *BlueprintBookItem) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_BlueprintSchemaJSONBlueprintBookItem {
+	for _, expected := range enumValues_BlueprintBookItem {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintSchemaJSONBlueprintBookItem, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintBookItem, v)
 	}
-	*j = BlueprintSchemaJSONBlueprintBookItem(v)
+	*j = BlueprintBookItem(v)
 	return nil
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *BlueprintSchemaJSONBlueprintBookItem) UnmarshalYAML(value *yaml.Node) error {
+func (j *BlueprintBookItem) UnmarshalYAML(value *yaml.Node) error {
 	var v string
 	if err := value.Decode(&v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_BlueprintSchemaJSONBlueprintBookItem {
+	for _, expected := range enumValues_BlueprintBookItem {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintSchemaJSONBlueprintBookItem, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintBookItem, v)
 	}
-	*j = BlueprintSchemaJSONBlueprintBookItem(v)
+	*j = BlueprintBookItem(v)
 	return nil
 }
 
@@ -1293,50 +1298,50 @@ func (j *SignalIDType) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *BlueprintSchemaJSONBlueprintBook) UnmarshalJSON(b []byte) error {
+func (j *BlueprintBook) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
 	if v, ok := raw["blueprints"]; !ok || v == nil {
-		return fmt.Errorf("field blueprints in BlueprintSchemaJSONBlueprintBook: required")
+		return fmt.Errorf("field blueprints in BlueprintBook: required")
 	}
 	if v, ok := raw["item"]; !ok || v == nil {
-		return fmt.Errorf("field item in BlueprintSchemaJSONBlueprintBook: required")
+		return fmt.Errorf("field item in BlueprintBook: required")
 	}
 	if v, ok := raw["version"]; !ok || v == nil {
-		return fmt.Errorf("field version in BlueprintSchemaJSONBlueprintBook: required")
+		return fmt.Errorf("field version in BlueprintBook: required")
 	}
-	type Plain BlueprintSchemaJSONBlueprintBook
+	type Plain BlueprintBook
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	*j = BlueprintSchemaJSONBlueprintBook(plain)
+	*j = BlueprintBook(plain)
 	return nil
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *BlueprintSchemaJSONBlueprintBook) UnmarshalYAML(value *yaml.Node) error {
+func (j *BlueprintBook) UnmarshalYAML(value *yaml.Node) error {
 	var raw map[string]interface{}
 	if err := value.Decode(&raw); err != nil {
 		return err
 	}
 	if v, ok := raw["blueprints"]; !ok || v == nil {
-		return fmt.Errorf("field blueprints in BlueprintSchemaJSONBlueprintBook: required")
+		return fmt.Errorf("field blueprints in BlueprintBook: required")
 	}
 	if v, ok := raw["item"]; !ok || v == nil {
-		return fmt.Errorf("field item in BlueprintSchemaJSONBlueprintBook: required")
+		return fmt.Errorf("field item in BlueprintBook: required")
 	}
 	if v, ok := raw["version"]; !ok || v == nil {
-		return fmt.Errorf("field version in BlueprintSchemaJSONBlueprintBook: required")
+		return fmt.Errorf("field version in BlueprintBook: required")
 	}
-	type Plain BlueprintSchemaJSONBlueprintBook
+	type Plain BlueprintBook
 	var plain Plain
 	if err := value.Decode(&plain); err != nil {
 		return err
 	}
-	*j = BlueprintSchemaJSONBlueprintBook(plain)
+	*j = BlueprintBook(plain)
 	return nil
 }
 
