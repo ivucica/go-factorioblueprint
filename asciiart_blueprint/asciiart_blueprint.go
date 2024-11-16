@@ -12,7 +12,7 @@
 // correct. We can keep it ONLY as an internal piece of code for purposes of
 // tilemap (to use integers), but with sparse tilemap maybe even that is not
 // necessary.
-package asciiart_blueprint
+package asciiart_blueprint // badc0de.net/pkg/factorioblueprint/asciiart_blueprint
 
 import (
 	"fmt"

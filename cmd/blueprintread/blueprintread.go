@@ -1,4 +1,4 @@
-// blueprintread reads a b64-encoded zstd-compressed blueprint string from a
+// blueprintread reads a b64-encoded zlib-compressed blueprint string from a
 // file, which is in JSON format at that point, then tries to read it into a
 // schema, and print it out in some form.
 package main // badc0de.net/pkg/factorioblueprint/cmd/blueprintread
