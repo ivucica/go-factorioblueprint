@@ -585,12 +585,54 @@
         },
         "filters": {
           "type": "array",
-          "items": { "$ref": "#/definitions/itemFilter" },
-          "description": "Filters used by constant combinators and other entities."
+          "items": { "$ref": "#/definitions/blueprintLogisticFilter" },
+          "description": "Array that used to contain ConstantCombinatorParameters, and now might be BlueprintLogisticFilter -- see https://lua-api.factorio.com/latest/concepts/BlueprintLogisticFilter.html"
         },
         "is_on": {
           "type": "boolean",
           "description": "Indicates if the entity is active."
+        }
+      }
+    },
+    "blueprintLogisticFilter": {
+      "type": "object",
+      "description": "A filter used in control behavior.",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "1-based index of the filter (a 'LogisticFilterIndex')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the item prototype."
+        },
+        "count": {
+          "type": "integer",
+          "description": "Requested item count."
+        },
+        "type": {
+          "$ref": "#/definitions/signalID",
+          "description": "The type of the logistic filter."
+        },
+        "quality": {
+          "type": "string",
+          "description": "The prototype name of the quality. nil for any quality."
+        },
+        "comparator": {
+          "type": "string",
+          "description": "The comparator for quality. nil if any quality."
+        },
+        "max_count": {
+          "type": "integer",
+          "description": "Max count of items."
+        },
+        "minimum_delivery_count": {
+          "type": "integer",
+          "description": "Minimum number of items to deliver. Defaults to 0."
+        },
+        "import_from": {
+          "type": "string",
+          "description": "Planet to import from."
         }
       }
     },
