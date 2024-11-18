@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "dereference-json-schema": "^0.2.1"
+  }
+}

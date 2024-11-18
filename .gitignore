@@ -1,1 +1,3 @@
 /_testdata
+/blueprint.schema.dereferenced.json
+node_modules/
