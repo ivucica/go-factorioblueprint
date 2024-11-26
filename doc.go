@@ -8,6 +8,8 @@
 //
 // Usage
 //
+// Obtain and install the binary for the basic reader:
+//
 //     $ go install badc0de.net/pkg/factorioblueprint/cmd/blueprintread@latest
 //
 // which can then be printed out with the default prettyprint:
