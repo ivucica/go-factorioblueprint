@@ -9,6 +9,11 @@ jobs:
         steps:
         - name: Check out repository
           uses: actions/checkout@v4
+        - name: Fix for https://github.com/actions/runner/issues/2033 - dir from issue and docker run -v
+          # Note how updating to newer checkout action did not resolve the issue, even if https://github.com/actions/checkout/issues/766 suggests it should have.
+          run: mkdir -p /home/runner/work/_temp/_github_home && printf "[safe]\ndirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
+        - name: Fix for https://github.com/actions/runner/issues/2033 pt2 - dir from checkout v4 action
+          run: mkdir -p /home/runner/work/_temp/_github_workflow && printf "[safe]\ndirectory = /github/workspace" > /home/runner/work/_temp/_github_workflow/.gitconfig
         - name: Update readme according to Go doc
           uses: posener/goreadme@v1
           with:
