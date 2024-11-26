@@ -15,5 +15,12 @@ jobs:
             badge-travisci: 'false'
             badge-codecov: 'false'
             badge-godoc: 'true'
+            recursive: 'true'
+            import-path: 'badc0de.net/pkg/factorioblueprint'
+            functions: 'true'
+            factories: 'true'
+            methods: 'true'
+            types: 'true'
+            constants: 'true'
             # Optional: Token allows goreadme to comment the PR with diff preview.
             github-token: '${{ secrets.GITHUB_TOKEN }}'
