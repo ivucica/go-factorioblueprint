@@ -29,5 +29,6 @@ jobs:
             methods: 'true'
             types: 'true'
             constants: 'true'
+            email: 'goreadme@blackhole.bots.badc0de.net'
             # Optional: Token allows goreadme to comment the PR with diff preview.
             github-token: '${{ secrets.GITHUB_TOKEN }}'
