@@ -19,4 +19,4 @@
 //     $ blueprintread -fmt=raw_json -file read_blueprint/simple.txt
 //     $ blueprintread -fmt=yaml -file read_blueprint/simple.txt
 //
-package factorioblueprint
+package factorioblueprint // badc0de.net/pkg/factorioblueprint
