@@ -27,6 +27,9 @@ if [[ ! -e /usr/bin/yosys ]] ; then
 fi
 
 # we could pipe directly, but let's keep a debug file around
-(cd ../../../github.com/Redcrafter/verilog2factorio ;  ./v2f -g chunkAnnealing ./samples/counter.v | tail -n+4) > /tmp/blueprint.txt
+V2F="$(realpath "${V2F:-../../../github.com/Redcrafter/verilog2factorio}")"  # note: does not affect where it gets installed, which is decided a few lines above
+INFILE="${1:-"${V2F}/samples/counter.v"}"
+INFILE="$(realpath "${INFILE}")"
+(cd "${V2F}" ;  ./v2f -g chunkAnnealing "${INFILE}" | tail -n+4) > /tmp/blueprint.txt
 blueprintread "$@" < /tmp/blueprint.txt
 
