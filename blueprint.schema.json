@@ -308,6 +308,10 @@
         "tags": {
           "type": "object",
           "description": "Dictionary of arbitrary data (optional)."
+        },
+        "player_description": {
+          "type": "string",
+          "description": "Player-defined description for the entity."
         }
       },
       "required": ["entity_number", "name", "position"]
@@ -588,6 +592,17 @@
           "items": { "$ref": "#/definitions/blueprintLogisticFilter" },
           "description": "Array that used to contain ConstantCombinatorParameters, and now might be BlueprintLogisticFilter -- see https://lua-api.factorio.com/latest/concepts/BlueprintLogisticFilter.html"
         },
+        "sections": {
+          "type": "object",
+          "description": "Sections of the control behavior.",
+          "properties": {
+            "sections": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/section" },
+              "description": "List of sections in the control behavior."
+            }
+          }
+        },
         "is_on": {
           "type": "boolean",
           "description": "Indicates if the entity is active."
@@ -751,6 +766,51 @@
           "description": "Custom message for the alert."
         }
       }
+    },
+    "section": {
+      "type": "object",
+      "description": "A section within the control behavior.",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Index of the section.",
+          "minimum": 1
+        },
+        "filters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/filter" },
+          "description": "Filters within the section."
+        }
+      },
+      "required": ["index", "filters"]
+    },
+    "filter": {
+      "type": "object",
+      "description": "A filter within a section.",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Index of the filter.",
+          "minimum": 1
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the filtered item."
+        },
+        "quality": {
+          "type": "string",
+          "description": "Quality level of the item."
+        },
+        "comparator": {
+          "type": "string",
+          "description": "Comparator used for filtering."
+        },
+        "count": {
+          "type": "integer",
+          "description": "Count threshold for the filter."
+        }
+      },
+      "required": ["index", "name", "comparator", "count"]
     }
   }
 }
