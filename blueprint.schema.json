@@ -307,7 +307,7 @@
         },
         "tags": {
           "type": "object",
-          "description": "Dictionary of arbitrary data (optional)."
+          "description": "Dictionary of arbitrary data, optional. See https://lua-api.factorio.com/latest/concepts/Tags.html for details."
         },
         "player_description": {
           "type": "string",
@@ -533,6 +533,10 @@
         "ticks": {
           "type": "integer",
           "description": "Number of ticks to wait (used with 'time' or 'inactivity' types)."
+        },
+        "condition": {
+          "$ref": "#/definitions/condition",
+          "description": "A condition object used when type is 'item_count', 'circuit', or 'fluid_count' (optional)."
         }
       }
     },
@@ -569,28 +573,32 @@
     },
     "controlBehavior": {
       "type": "object",
-      "description": "Control behavior settings for entities.",
+      "description": "Control behavior settings for entities. (Updated for Factorio 2.0)",
       "properties": {
         "circuit_condition": {
           "$ref": "#/definitions/condition",
-          "description": "Condition for circuit network signals."
+          "description": "Condition for circuit network signals (optional, updated for 2.x)."
         },
         "logistic_condition": {
           "$ref": "#/definitions/condition",
-          "description": "Condition for logistic network signals."
+          "description": "Condition for logistic network signals (optional)."
         },
         "arithmetic_conditions": {
           "$ref": "#/definitions/arithmeticConditions",
-          "description": "Settings for arithmetic combinators."
+          "description": "Settings for arithmetic combinators (optional, updated for 2.x)."
         },
         "decider_conditions": {
           "$ref": "#/definitions/deciderConditions",
-          "description": "Settings for decider combinators."
+          "description": "Settings for decider combinators (optional, updated for 2.x)."
+        },
+        "circuit_parameters": {
+          "type": "object",
+          "description": "Parameters for circuit network behavior (new in Factorio 2.0)."
         },
         "filters": {
           "type": "array",
           "items": { "$ref": "#/definitions/blueprintLogisticFilter" },
-          "description": "Array that used to contain ConstantCombinatorParameters, and now might be BlueprintLogisticFilter -- see https://lua-api.factorio.com/latest/concepts/BlueprintLogisticFilter.html"
+          "description": "Array that used to contain ConstantCombinatorParameters, and now might be BlueprintLogisticFilter."
         },
         "sections": {
           "type": "object",

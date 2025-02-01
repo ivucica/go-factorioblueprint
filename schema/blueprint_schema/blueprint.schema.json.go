@@ -196,31 +196,36 @@ type ConnectionPoint struct {
 	Red []ConnectionData `json:"red,omitempty" yaml:"red,omitempty" mapstructure:"red,omitempty"`
 }
 
-// Control behavior settings for entities.
+// Control behavior settings for entities. (Updated for Factorio 2.0)
 type ControlBehavior struct {
-	// Settings for arithmetic combinators.
+	// Settings for arithmetic combinators (optional, updated for 2.x).
 	ArithmeticConditions *ArithmeticConditions `json:"arithmetic_conditions,omitempty" yaml:"arithmetic_conditions,omitempty" mapstructure:"arithmetic_conditions,omitempty"`
 
-	// Condition for circuit network signals.
+	// Condition for circuit network signals (optional, updated for 2.x).
 	CircuitCondition *Condition `json:"circuit_condition,omitempty" yaml:"circuit_condition,omitempty" mapstructure:"circuit_condition,omitempty"`
 
-	// Settings for decider combinators.
+	// Parameters for circuit network behavior (new in Factorio 2.0).
+	CircuitParameters ControlBehaviorCircuitParameters `json:"circuit_parameters,omitempty" yaml:"circuit_parameters,omitempty" mapstructure:"circuit_parameters,omitempty"`
+
+	// Settings for decider combinators (optional, updated for 2.x).
 	DeciderConditions *DeciderConditions `json:"decider_conditions,omitempty" yaml:"decider_conditions,omitempty" mapstructure:"decider_conditions,omitempty"`
 
 	// Array that used to contain ConstantCombinatorParameters, and now might be
-	// BlueprintLogisticFilter -- see
-	// https://lua-api.factorio.com/latest/concepts/BlueprintLogisticFilter.html
+	// BlueprintLogisticFilter.
 	Filters []BlueprintLogisticFilter `json:"filters,omitempty" yaml:"filters,omitempty" mapstructure:"filters,omitempty"`
 
 	// Indicates if the entity is active.
 	IsOn *bool `json:"is_on,omitempty" yaml:"is_on,omitempty" mapstructure:"is_on,omitempty"`
 
-	// Condition for logistic network signals.
+	// Condition for logistic network signals (optional).
 	LogisticCondition *Condition `json:"logistic_condition,omitempty" yaml:"logistic_condition,omitempty" mapstructure:"logistic_condition,omitempty"`
 
 	// Sections of the control behavior.
 	Sections *ControlBehaviorSections `json:"sections,omitempty" yaml:"sections,omitempty" mapstructure:"sections,omitempty"`
 }
+
+// Parameters for circuit network behavior (new in Factorio 2.0).
+type ControlBehaviorCircuitParameters map[string]interface{}
 
 // Sections of the control behavior.
 type ControlBehaviorSections struct {
@@ -348,7 +353,8 @@ type Entity struct {
 	// Current state of the power switch (optional).
 	SwitchState *bool `json:"switch_state,omitempty" yaml:"switch_state,omitempty" mapstructure:"switch_state,omitempty"`
 
-	// Dictionary of arbitrary data (optional).
+	// Dictionary of arbitrary data, optional. See
+	// https://lua-api.factorio.com/latest/concepts/Tags.html for details.
 	Tags EntityTags `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// Boot/Luggage inventory of an entity (e.g., storage inventory of a Spidertron)
@@ -377,7 +383,8 @@ type EntityOutputPriority string
 const EntityOutputPriorityLeft EntityOutputPriority = "left"
 const EntityOutputPriorityRight EntityOutputPriority = "right"
 
-// Dictionary of arbitrary data (optional).
+// Dictionary of arbitrary data, optional. See
+// https://lua-api.factorio.com/latest/concepts/Tags.html for details.
 type EntityTags map[string]interface{}
 
 type EntityType string
@@ -442,37 +449,90 @@ type InfinitySettings struct {
 	RemoveUnfilteredItems *bool `json:"remove_unfiltered_items,omitempty" yaml:"remove_unfiltered_items,omitempty" mapstructure:"remove_unfiltered_items,omitempty"`
 }
 
-// Configuration of an entity's inventory.
-type Inventory struct {
-	// Index of the first inaccessible slot due to the red 'bar'.
-	Bar *int `json:"bar,omitempty" yaml:"bar,omitempty" mapstructure:"bar,omitempty"`
-
-	// Array of item filters.
-	Filters []ItemFilter `json:"filters,omitempty" yaml:"filters,omitempty" mapstructure:"filters,omitempty"`
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *EntityType) UnmarshalYAML(value *yaml.Node) error {
+	var v string
+	if err := value.Decode(&v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_EntityType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityType, v)
+	}
+	*j = EntityType(v)
+	return nil
 }
 
-// Filter settings for items in an inventory.
-type ItemFilter struct {
-	// 1-based index of the filter slot.
-	Index int `json:"index" yaml:"index" mapstructure:"index"`
-
-	// Name of the item prototype.
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
+var enumValues_EntityFilterMode = []interface{}{
+	"whitelist",
+	"blacklist",
 }
 
-// Item requests by the entity for construction.
-type ItemRequest map[string]int
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *EntityFilterMode) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_EntityFilterMode {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityFilterMode, v)
+	}
+	*j = EntityFilterMode(v)
+	return nil
+}
 
-// Filter settings for logistic containers.
-type LogisticFilter struct {
-	// Requested item count (0 for storage chests).
-	Count *int `json:"count,omitempty" yaml:"count,omitempty" mapstructure:"count,omitempty"`
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *EntityFilterMode) UnmarshalYAML(value *yaml.Node) error {
+	var v string
+	if err := value.Decode(&v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_EntityFilterMode {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityFilterMode, v)
+	}
+	*j = EntityFilterMode(v)
+	return nil
+}
 
-	// 1-based index of the filter slot.
-	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
-
-	// Name of the item prototype.
-	Name *string `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *Position) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["x"]; !ok || v == nil {
+		return fmt.Errorf("field x in Position: required")
+	}
+	if v, ok := raw["y"]; !ok || v == nil {
+		return fmt.Errorf("field y in Position: required")
+	}
+	type Plain Position
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = Position(plain)
+	return nil
 }
 
 // A position in 2D space.
@@ -484,141 +544,51 @@ type Position struct {
 	Y float64 `json:"y" yaml:"y" mapstructure:"y"`
 }
 
-// Train schedule data.
-type Schedule struct {
-	// Entity numbers of locomotives using this schedule.
-	Locomotives []int `json:"locomotives,omitempty" yaml:"locomotives,omitempty" mapstructure:"locomotives,omitempty"`
-
-	// Array of schedule records.
-	Schedule []ScheduleRecord `json:"schedule,omitempty" yaml:"schedule,omitempty" mapstructure:"schedule,omitempty"`
-}
-
-// A single record in a train schedule.
-type ScheduleRecord struct {
-	// Name of the train stop.
-	Station *string `json:"station,omitempty" yaml:"station,omitempty" mapstructure:"station,omitempty"`
-
-	// Conditions under which the train waits at this stop.
-	WaitConditions []WaitCondition `json:"wait_conditions,omitempty" yaml:"wait_conditions,omitempty" mapstructure:"wait_conditions,omitempty"`
-}
-
-// A section within the control behavior.
-type Section struct {
-	// Filters within the section.
-	Filters []Filter `json:"filters" yaml:"filters" mapstructure:"filters"`
-
-	// Index of the section.
-	Index int `json:"index" yaml:"index" mapstructure:"index"`
-}
-
-// An identifier for a signal in the game.
-type SignalID struct {
-	// The name of the signal.
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The type of the signal.
-	Type *SignalIDType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
-}
-
-type SignalIDType string
-
-const SignalIDTypeFluid SignalIDType = "fluid"
-const SignalIDTypeItem SignalIDType = "item"
-const SignalIDTypeVirtual SignalIDType = "virtual"
-
-// Alert settings for a programmable speaker.
-type SpeakerAlertParameters struct {
-	// Custom message for the alert.
-	AlertMessage *string `json:"alert_message,omitempty" yaml:"alert_message,omitempty" mapstructure:"alert_message,omitempty"`
-
-	// Icon displayed with the alert.
-	IconSignalID *SignalID `json:"icon_signal_id,omitempty" yaml:"icon_signal_id,omitempty" mapstructure:"icon_signal_id,omitempty"`
-
-	// Whether to show an alert.
-	ShowAlert *bool `json:"show_alert,omitempty" yaml:"show_alert,omitempty" mapstructure:"show_alert,omitempty"`
-
-	// Whether to show the alert on the map.
-	ShowOnMap *bool `json:"show_on_map,omitempty" yaml:"show_on_map,omitempty" mapstructure:"show_on_map,omitempty"`
-}
-
-// Playback settings for a programmable speaker.
-type SpeakerParameters struct {
-	// Whether multiple sounds can play simultaneously.
-	AllowPolyphony *bool `json:"allow_polyphony,omitempty" yaml:"allow_polyphony,omitempty" mapstructure:"allow_polyphony,omitempty"`
-
-	// Whether the sound plays globally.
-	PlaybackGlobally *bool `json:"playback_globally,omitempty" yaml:"playback_globally,omitempty" mapstructure:"playback_globally,omitempty"`
-
-	// Volume of the speaker.
-	PlaybackVolume *float64 `json:"playback_volume,omitempty" yaml:"playback_volume,omitempty" mapstructure:"playback_volume,omitempty"`
-}
-
-// A tile placed within the blueprint.
-type Tile struct {
-	// The prototype name of the tile.
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The position of the tile on the blueprint grid.
-	Position Position `json:"position" yaml:"position" mapstructure:"position"`
-}
-
-// A condition defining how long a train waits at a station.
-type WaitCondition struct {
-	// Logical operator for combining conditions.
-	CompareType *WaitConditionCompareType `json:"compare_type,omitempty" yaml:"compare_type,omitempty" mapstructure:"compare_type,omitempty"`
-
-	// Number of ticks to wait (used with 'time' or 'inactivity' types).
-	Ticks *int `json:"ticks,omitempty" yaml:"ticks,omitempty" mapstructure:"ticks,omitempty"`
-
-	// Type of the wait condition.
-	Type *string `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
-}
-
-type WaitConditionCompareType string
-
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *EntityInputPriority) UnmarshalYAML(value *yaml.Node) error {
-	var v string
-	if err := value.Decode(&v); err != nil {
+func (j *Section) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
 		return err
 	}
-	var ok bool
-	for _, expected := range enumValues_EntityInputPriority {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
+	if v, ok := raw["filters"]; !ok || v == nil {
+		return fmt.Errorf("field filters in Section: required")
 	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityInputPriority, v)
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Section: required")
 	}
-	*j = EntityInputPriority(v)
+	type Plain Section
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = Section(plain)
 	return nil
 }
 
+var enumValues_InfinityFilterMode = []interface{}{
+	"at-least",
+	"at-most",
+	"exactly",
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *EntityInputPriority) UnmarshalJSON(b []byte) error {
+func (j *InfinityFilterMode) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_EntityInputPriority {
+	for _, expected := range enumValues_InfinityFilterMode {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityInputPriority, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_InfinityFilterMode, v)
 	}
-	*j = EntityInputPriority(v)
+	*j = InfinityFilterMode(v)
 	return nil
-}
-
-var enumValues_EntityInputPriority = []interface{}{
-	"right",
-	"left",
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
@@ -642,22 +612,220 @@ func (j *InfinityFilterMode) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *InfinityFilterMode) UnmarshalJSON(b []byte) error {
+func (j *Section) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["filters"]; !ok || v == nil {
+		return fmt.Errorf("field filters in Section: required")
+	}
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Section: required")
+	}
+	type Plain Section
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = Section(plain)
+	return nil
+}
+
+// A section within the control behavior.
+type Section struct {
+	// Filters within the section.
+	Filters []Filter `json:"filters" yaml:"filters" mapstructure:"filters"`
+
+	// Index of the section.
+	Index int `json:"index" yaml:"index" mapstructure:"index"`
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *Filter) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["comparator"]; !ok || v == nil {
+		return fmt.Errorf("field comparator in Filter: required")
+	}
+	if v, ok := raw["count"]; !ok || v == nil {
+		return fmt.Errorf("field count in Filter: required")
+	}
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Filter: required")
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in Filter: required")
+	}
+	type Plain Filter
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = Filter(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *Filter) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["comparator"]; !ok || v == nil {
+		return fmt.Errorf("field comparator in Filter: required")
+	}
+	if v, ok := raw["count"]; !ok || v == nil {
+		return fmt.Errorf("field count in Filter: required")
+	}
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Filter: required")
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in Filter: required")
+	}
+	type Plain Filter
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = Filter(plain)
+	return nil
+}
+
+type SignalIDType string
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *ConnectionData) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["entity_id"]; !ok || v == nil {
+		return fmt.Errorf("field entity_id in ConnectionData: required")
+	}
+	type Plain ConnectionData
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = ConnectionData(plain)
+	return nil
+}
+
+var enumValues_EntityInputPriority = []interface{}{
+	"right",
+	"left",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *EntityInputPriority) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_InfinityFilterMode {
+	for _, expected := range enumValues_EntityInputPriority {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_InfinityFilterMode, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityInputPriority, v)
 	}
-	*j = InfinityFilterMode(v)
+	*j = EntityInputPriority(v)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *EntityInputPriority) UnmarshalYAML(value *yaml.Node) error {
+	var v string
+	if err := value.Decode(&v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_EntityInputPriority {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityInputPriority, v)
+	}
+	*j = EntityInputPriority(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ConnectionData) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["entity_id"]; !ok || v == nil {
+		return fmt.Errorf("field entity_id in ConnectionData: required")
+	}
+	type Plain ConnectionData
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = ConnectionData(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *Color) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["b"]; !ok || v == nil {
+		return fmt.Errorf("field b in Color: required")
+	}
+	if v, ok := raw["g"]; !ok || v == nil {
+		return fmt.Errorf("field g in Color: required")
+	}
+	if v, ok := raw["r"]; !ok || v == nil {
+		return fmt.Errorf("field r in Color: required")
+	}
+	type Plain Color
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = Color(plain)
+	return nil
+}
+
+// Item requests by the entity for construction.
+type ItemRequest map[string]int
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *Color) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["b"]; !ok || v == nil {
+		return fmt.Errorf("field b in Color: required")
+	}
+	if v, ok := raw["g"]; !ok || v == nil {
+		return fmt.Errorf("field g in Color: required")
+	}
+	if v, ok := raw["r"]; !ok || v == nil {
+		return fmt.Errorf("field r in Color: required")
+	}
+	type Plain Color
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = Color(plain)
 	return nil
 }
 
@@ -706,97 +874,88 @@ func (j *EntityOutputPriority) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-var enumValues_InfinityFilterMode = []interface{}{
-	"at-least",
-	"at-most",
-	"exactly",
+// Configuration of an entity's inventory.
+type Inventory struct {
+	// Index of the first inaccessible slot due to the red 'bar'.
+	Bar *int `json:"bar,omitempty" yaml:"bar,omitempty" mapstructure:"bar,omitempty"`
+
+	// Array of item filters.
+	Filters []ItemFilter `json:"filters,omitempty" yaml:"filters,omitempty" mapstructure:"filters,omitempty"`
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *EntityFilterMode) UnmarshalYAML(value *yaml.Node) error {
-	var v string
-	if err := value.Decode(&v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_EntityFilterMode {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityFilterMode, v)
-	}
-	*j = EntityFilterMode(v)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *EntityFilterMode) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_EntityFilterMode {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityFilterMode, v)
-	}
-	*j = EntityFilterMode(v)
-	return nil
-}
-
-var enumValues_EntityFilterMode = []interface{}{
-	"whitelist",
-	"blacklist",
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *Position) UnmarshalYAML(value *yaml.Node) error {
+func (j *ItemFilter) UnmarshalYAML(value *yaml.Node) error {
 	var raw map[string]interface{}
 	if err := value.Decode(&raw); err != nil {
 		return err
 	}
-	if v, ok := raw["x"]; !ok || v == nil {
-		return fmt.Errorf("field x in Position: required")
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in ItemFilter: required")
 	}
-	if v, ok := raw["y"]; !ok || v == nil {
-		return fmt.Errorf("field y in Position: required")
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in ItemFilter: required")
 	}
-	type Plain Position
+	type Plain ItemFilter
 	var plain Plain
 	if err := value.Decode(&plain); err != nil {
 		return err
 	}
-	*j = Position(plain)
+	*j = ItemFilter(plain)
 	return nil
 }
 
+// Playback settings for a programmable speaker.
+type SpeakerParameters struct {
+	// Whether multiple sounds can play simultaneously.
+	AllowPolyphony *bool `json:"allow_polyphony,omitempty" yaml:"allow_polyphony,omitempty" mapstructure:"allow_polyphony,omitempty"`
+
+	// Whether the sound plays globally.
+	PlaybackGlobally *bool `json:"playback_globally,omitempty" yaml:"playback_globally,omitempty" mapstructure:"playback_globally,omitempty"`
+
+	// Volume of the speaker.
+	PlaybackVolume *float64 `json:"playback_volume,omitempty" yaml:"playback_volume,omitempty" mapstructure:"playback_volume,omitempty"`
+}
+
+// Filter settings for logistic containers.
+type LogisticFilter struct {
+	// Requested item count (0 for storage chests).
+	Count *int `json:"count,omitempty" yaml:"count,omitempty" mapstructure:"count,omitempty"`
+
+	// 1-based index of the filter slot.
+	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
+
+	// Name of the item prototype.
+	Name *string `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *Position) UnmarshalJSON(b []byte) error {
+func (j *ItemFilter) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
-	if v, ok := raw["x"]; !ok || v == nil {
-		return fmt.Errorf("field x in Position: required")
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in ItemFilter: required")
 	}
-	if v, ok := raw["y"]; !ok || v == nil {
-		return fmt.Errorf("field y in Position: required")
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in ItemFilter: required")
 	}
-	type Plain Position
+	type Plain ItemFilter
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	*j = Position(plain)
+	*j = ItemFilter(plain)
 	return nil
+}
+
+// Filter settings for items in an inventory.
+type ItemFilter struct {
+	// 1-based index of the filter slot.
+	Index int `json:"index" yaml:"index" mapstructure:"index"`
+
+	// Name of the item prototype.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
 }
 
 var enumValues_EntityType = []interface{}{
@@ -825,91 +984,74 @@ func (j *EntityType) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *EntityType) UnmarshalYAML(value *yaml.Node) error {
-	var v string
-	if err := value.Decode(&v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_EntityType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityType, v)
-	}
-	*j = EntityType(v)
-	return nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *Section) UnmarshalYAML(value *yaml.Node) error {
+func (j *Position) UnmarshalYAML(value *yaml.Node) error {
 	var raw map[string]interface{}
 	if err := value.Decode(&raw); err != nil {
 		return err
 	}
-	if v, ok := raw["filters"]; !ok || v == nil {
-		return fmt.Errorf("field filters in Section: required")
+	if v, ok := raw["x"]; !ok || v == nil {
+		return fmt.Errorf("field x in Position: required")
 	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Section: required")
+	if v, ok := raw["y"]; !ok || v == nil {
+		return fmt.Errorf("field y in Position: required")
 	}
-	type Plain Section
+	type Plain Position
 	var plain Plain
 	if err := value.Decode(&plain); err != nil {
 		return err
 	}
-	*j = Section(plain)
+	*j = Position(plain)
+	return nil
+}
+
+// Alert settings for a programmable speaker.
+type SpeakerAlertParameters struct {
+	// Custom message for the alert.
+	AlertMessage *string `json:"alert_message,omitempty" yaml:"alert_message,omitempty" mapstructure:"alert_message,omitempty"`
+
+	// Icon displayed with the alert.
+	IconSignalID *SignalID `json:"icon_signal_id,omitempty" yaml:"icon_signal_id,omitempty" mapstructure:"icon_signal_id,omitempty"`
+
+	// Whether to show an alert.
+	ShowAlert *bool `json:"show_alert,omitempty" yaml:"show_alert,omitempty" mapstructure:"show_alert,omitempty"`
+
+	// Whether to show the alert on the map.
+	ShowOnMap *bool `json:"show_on_map,omitempty" yaml:"show_on_map,omitempty" mapstructure:"show_on_map,omitempty"`
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *SignalID) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in SignalID: required")
+	}
+	type Plain SignalID
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = SignalID(plain)
 	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *Section) UnmarshalJSON(b []byte) error {
+func (j *SignalID) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
-	if v, ok := raw["filters"]; !ok || v == nil {
-		return fmt.Errorf("field filters in Section: required")
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in SignalID: required")
 	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Section: required")
-	}
-	type Plain Section
+	type Plain SignalID
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	*j = Section(plain)
-	return nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *Filter) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["comparator"]; !ok || v == nil {
-		return fmt.Errorf("field comparator in Filter: required")
-	}
-	if v, ok := raw["count"]; !ok || v == nil {
-		return fmt.Errorf("field count in Filter: required")
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Filter: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in Filter: required")
-	}
-	type Plain Filter
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = Filter(plain)
+	*j = SignalID(plain)
 	return nil
 }
 
@@ -961,31 +1103,13 @@ func (j *Entity) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *Filter) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["comparator"]; !ok || v == nil {
-		return fmt.Errorf("field comparator in Filter: required")
-	}
-	if v, ok := raw["count"]; !ok || v == nil {
-		return fmt.Errorf("field count in Filter: required")
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Filter: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in Filter: required")
-	}
-	type Plain Filter
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = Filter(plain)
-	return nil
+// An identifier for a signal in the game.
+type SignalID struct {
+	// The name of the signal.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The type of the signal.
+	Type *SignalIDType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1030,23 +1154,7 @@ func (j *Icon) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *ConnectionData) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["entity_id"]; !ok || v == nil {
-		return fmt.Errorf("field entity_id in ConnectionData: required")
-	}
-	type Plain ConnectionData
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = ConnectionData(plain)
-	return nil
-}
+type WaitConditionCompareType string
 
 var enumValues_WaitConditionCompareType = []interface{}{
 	"and",
@@ -1096,91 +1204,47 @@ func (j *WaitConditionCompareType) UnmarshalYAML(value *yaml.Node) error {
 const WaitConditionCompareTypeAnd WaitConditionCompareType = "and"
 const WaitConditionCompareTypeOr WaitConditionCompareType = "or"
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *ConnectionData) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["entity_id"]; !ok || v == nil {
-		return fmt.Errorf("field entity_id in ConnectionData: required")
-	}
-	type Plain ConnectionData
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = ConnectionData(plain)
-	return nil
+// A condition defining how long a train waits at a station.
+type WaitCondition struct {
+	// Logical operator for combining conditions.
+	CompareType *WaitConditionCompareType `json:"compare_type,omitempty" yaml:"compare_type,omitempty" mapstructure:"compare_type,omitempty"`
+
+	// A condition object used when type is 'item_count', 'circuit', or 'fluid_count'
+	// (optional).
+	Condition *Condition `json:"condition,omitempty" yaml:"condition,omitempty" mapstructure:"condition,omitempty"`
+
+	// Number of ticks to wait (used with 'time' or 'inactivity' types).
+	Ticks *int `json:"ticks,omitempty" yaml:"ticks,omitempty" mapstructure:"ticks,omitempty"`
+
+	// Type of the wait condition.
+	Type *string `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *Color) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["b"]; !ok || v == nil {
-		return fmt.Errorf("field b in Color: required")
-	}
-	if v, ok := raw["g"]; !ok || v == nil {
-		return fmt.Errorf("field g in Color: required")
-	}
-	if v, ok := raw["r"]; !ok || v == nil {
-		return fmt.Errorf("field r in Color: required")
-	}
-	type Plain Color
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = Color(plain)
-	return nil
+// A single record in a train schedule.
+type ScheduleRecord struct {
+	// Name of the train stop.
+	Station *string `json:"station,omitempty" yaml:"station,omitempty" mapstructure:"station,omitempty"`
+
+	// Conditions under which the train waits at this stop.
+	WaitConditions []WaitCondition `json:"wait_conditions,omitempty" yaml:"wait_conditions,omitempty" mapstructure:"wait_conditions,omitempty"`
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *Color) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["b"]; !ok || v == nil {
-		return fmt.Errorf("field b in Color: required")
-	}
-	if v, ok := raw["g"]; !ok || v == nil {
-		return fmt.Errorf("field g in Color: required")
-	}
-	if v, ok := raw["r"]; !ok || v == nil {
-		return fmt.Errorf("field r in Color: required")
-	}
-	type Plain Color
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = Color(plain)
-	return nil
+// Train schedule data.
+type Schedule struct {
+	// Entity numbers of locomotives using this schedule.
+	Locomotives []int `json:"locomotives,omitempty" yaml:"locomotives,omitempty" mapstructure:"locomotives,omitempty"`
+
+	// Array of schedule records.
+	Schedule []ScheduleRecord `json:"schedule,omitempty" yaml:"schedule,omitempty" mapstructure:"schedule,omitempty"`
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *ItemFilter) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in ItemFilter: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in ItemFilter: required")
-	}
-	type Plain ItemFilter
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = ItemFilter(plain)
-	return nil
+// A tile placed within the blueprint.
+type Tile struct {
+	// The prototype name of the tile.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The position of the tile on the blueprint grid.
+	Position Position `json:"position" yaml:"position" mapstructure:"position"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1225,26 +1289,7 @@ func (j *Tile) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *ItemFilter) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in ItemFilter: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in ItemFilter: required")
-	}
-	type Plain ItemFilter
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = ItemFilter(plain)
-	return nil
-}
+const SignalIDTypeVirtual SignalIDType = "virtual"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Blueprint) UnmarshalJSON(b []byte) error {
@@ -1300,23 +1345,7 @@ func (j *Blueprint) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *SignalID) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in SignalID: required")
-	}
-	type Plain SignalID
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = SignalID(plain)
-	return nil
-}
+const SignalIDTypeFluid SignalIDType = "fluid"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *BlueprintBookBlueprintsElem) UnmarshalJSON(b []byte) error {
@@ -1360,23 +1389,7 @@ func (j *BlueprintBookBlueprintsElem) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SignalID) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in SignalID: required")
-	}
-	type Plain SignalID
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SignalID(plain)
-	return nil
-}
+const SignalIDTypeItem SignalIDType = "item"
 
 var enumValues_BlueprintBookItem = []interface{}{
 	"blueprint-book",

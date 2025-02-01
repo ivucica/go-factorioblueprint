@@ -1,3 +1,4 @@
+{{Cleanup|Needs to be updated for 2.0}}
 [[File:blueprint_string_preview.png|thumb|340px|right|Preview of a blueprint string.]]This is a technical description of the blueprint string format, used to share blueprints with other users.
 
 A blueprint string is a JSON representation of the blueprint, compressed with zlib deflate using compression level 9 and then encoded using base64 with a version byte in front of the encoded string. The version byte is currently 0 (for all Factorio versions through 1.1).
@@ -267,7 +268,7 @@ The json representation of a blueprint or blueprint book is one large object ins
 | Boolean
 |-
 | tags
-| Dictionary of arbitrary data, optional. [https://lua-api.factorio.com/latest/concepts.html#Tags Tags].
+| Dictionary of arbitrary data, optional. [https://lua-api.factorio.com/latest/concepts/Tags.html Tags].
 | Object
 |}
 
@@ -335,7 +336,7 @@ The json representation of a blueprint or blueprint book is one large object ins
 | uint
 |-
 | condition
-| [https://lua-api.factorio.com/latest/concepts.html#CircuitCondition CircuitCondition object], only present when type is "item_count", "circuit" or "fluid_count".
+| [https://lua-api.factorio.com/latest/concepts/CircuitCondition.html CircuitCondition object], only present when type is "item_count", "circuit" or "fluid_count".
 | Object
 |}
 
@@ -551,7 +552,7 @@ Value is the amount of items to be requested, [[Types/ItemCountType]].
 ! Key !! Description !! Data type 
 |-
 | logistic_condition
-| [https://lua-api.factorio.com/latest/concepts.html#CircuitCondition CircuitCondition]
+| [https://lua-api.factorio.com/latest/concepts/CircuitCondition.html CircuitCondition]
 | Object
 |-
 | connect_to_logistic_network
@@ -583,7 +584,7 @@ Value is the amount of items to be requested, [[Types/ItemCountType]].
 | Object
 |-
 | circuit_condition
-| [https://lua-api.factorio.com/latest/concepts.html#CircuitCondition CircuitCondition]
+| [https://lua-api.factorio.com/latest/concepts/CircuitCondition.html CircuitCondition]
 | Object
 |-
 | circuit_enable_disable
@@ -695,19 +696,20 @@ Value is the amount of items to be requested, [[Types/ItemCountType]].
 | Boolean
 |-
 | filters
-| Array of [https://lua-api.factorio.com/latest/concepts.html#ConstantCombinatorParameters ConstantCombinatorParameters].
+| Array of <s>[https://lua-api.factorio.com/latest/concepts/BlueprintLogisticFilter.html ConstantCombinatorParameters].</s> It's now a kind of [https://lua-api.factorio.com/latest/concepts/LogisticSections.html LogisticSections] instead.
+''We might be missing a type for it specifically.''
 | Array
 |-
 | arithmetic_conditions
-| [https://lua-api.factorio.com/latest/concepts.html#ArithmeticCombinatorParameters ArithmeticCombinatorParameters]
+| [https://lua-api.factorio.com/latest/concepts/ArithmeticCombinatorParameters.html ArithmeticCombinatorParameters]
 | Object
 |-
 | decider_conditions
-| [https://lua-api.factorio.com/latest/concepts.html#DeciderCombinatorParameters DeciderCombinatorParameters]
+| [https://lua-api.factorio.com/latest/concepts/DeciderCombinatorParameters.html DeciderCombinatorParameters]
 | Object
 |-
 | circuit_parameters
-| [https://lua-api.factorio.com/latest/concepts.html#ProgrammableSpeakerCircuitParameters ProgrammableSpeakerCircuitParameters]
+| [https://lua-api.factorio.com/latest/concepts/ProgrammableSpeakerCircuitParameters.html ProgrammableSpeakerCircuitParameters]
 | Object
 |-
 | use_colors
