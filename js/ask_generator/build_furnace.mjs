@@ -5,6 +5,7 @@
 // in case we need to go over the network).
 
 import { readFileSync } from 'fs';
+import pkg from 'dereference-json-schema';
 
 // check number of args
 if (process.argv.length < 3) {
@@ -21,7 +22,17 @@ if (process.argv.length > 3) {
 
 // load schema
 // it must not contain any $ref
-const schema = JSON.parse(readFileSync('../blueprint.schema.dereferenced.json', 'utf8'));
+let schema;
+try {
+    schema = JSON.parse(readFileSync('../../blueprint.schema.dereferenced.json', 'utf8'));
+} catch (e) {
+    // if file was not found, build a dereferenced schema from the original
+    // schema
+    const schemaOrig = JSON.parse(readFileSync('../../blueprint.schema.json', 'utf8'));
+    // dereference it
+    const { dereferenceSync } = pkg;
+    schema = dereferenceSync(schemaOrig);
+}
 delete(schema['$schema']);
 delete(schema['$id']);
 schema['name'] = 'blueprint.schema.dereferenced.json';
