@@ -1,6 +1,9 @@
+codeberg.org/emersion/go-jsonschema v0.0.0-20251116133759-a828df140a57 h1:883n2jKUCJVmOa7SXzwSM2lZ5C3NAvmrKbwQkjX7/cg=
+codeberg.org/emersion/go-jsonschema v0.0.0-20251116133759-a828df140a57/go.mod h1:pJlMDatVvZdN7hLyVO5T5BqXbJ+w8LzM6cSip8UAVE8=
 github.com/atombender/go-jsonschema v0.15.0 h1:pBcCpeZ3eAKEQGRwxfRmbUIMRqJzDve3DPfrJCt4lBk=
 github.com/atombender/go-jsonschema v0.15.0/go.mod h1:JqTHPe4S0pVB4LH/CGKJzX+di8cnLwSYkDDXFoOewLw=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
+github.com/dave/jennifer v1.7.1/go.mod h1:nXbxhEmQfOZhWml3D1cDK5M1FLnMSozpbFN/m3RmGZc=
 github.com/davecgh/go-spew v0.0.0-20161028175848-04cdfd42973b h1:XxMZvQZtTXpWMNWK82vdjCLCe7uGMFXdTsJH0v3Hkvw=
 github.com/davecgh/go-spew v0.0.0-20161028175848-04cdfd42973b/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fatih/color v1.13.0 h1:8LOYc1KYPPmyKMuN8QV2DNRWNbLo6LZ0iLs8+mlH53w=

@@ -7,9 +7,12 @@ toolchain go1.24.4
 require github.com/klauspost/compress v1.17.11
 
 require (
+	codeberg.org/emersion/go-jsonschema v0.0.0-20251116133759-a828df140a57
 	github.com/atombender/go-jsonschema v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
 )
+
+// git.sr.ht/~emersion/go-jsonschema v0.0.0-20251116133438-10d822917a32 // indirect
 
 require (
 	github.com/fatih/color v1.13.0 // indirect
@@ -26,3 +29,9 @@ require (
 	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
+
+// tool block unsupported by current gopls, not using right now
+// tool (
+// 	codeberg.org/emersion/go-jsonschema
+// 	git.sr.ht/~emersion/go-jsonschema/cmd/jsonschemagen
+// )
