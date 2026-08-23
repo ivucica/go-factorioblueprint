@@ -9,5 +9,5 @@ package factorioblueprint
 //
 // See https://marcofranssen.nl/manage-go-tools-via-go-modules
 import (
-	_ "github.com/atombender/go-jsonschema" // @v0.14
+	_ "github.com/atombender/go-jsonschema" // @v0.15
 )

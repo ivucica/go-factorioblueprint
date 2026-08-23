@@ -1,0 +1,3 @@
+[submodule "factorio-blueprint-schemas"]
+	path = factorio-blueprint-schemas
+	url = https://github.com/redruin1/factorio-blueprint-schemas

@@ -7,7 +7,7 @@ toolchain go1.24.4
 require github.com/klauspost/compress v1.17.11
 
 require (
-	github.com/atombender/go-jsonschema v0.14.1
+	github.com/atombender/go-jsonschema v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
