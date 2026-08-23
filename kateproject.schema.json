@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Kate Project Configuration",
+  "description": "Schema for Kate editor project configuration files (.kateproject)",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The human-readable display name of the project in Kate's sidebar."
+    },
+    "directory": {
+      "type": "string",
+      "description": "The base directory root of the project. Defaults to the folder containing the .kateproject file."
+    },
+    "exclude_patterns": {
+      "type": "array",
+      "description": "An array of regular expression strings matching files or directories to exclude from the project.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "files": {
+      "type": "array",
+      "description": "List of automatic or manual file discovery methods used to populate the project tree.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "git": {
+            "type": "integer",
+            "enum": [1],
+            "description": "Set to 1 to automatically load files indexed by Git version control."
+          },
+          "hg": {
+            "type": "integer",
+            "enum": [1],
+            "description": "Set to 1 to automatically load files indexed by Mercurial version control."
+          },
+          "svn": {
+            "type": "integer",
+            "enum": [1],
+            "description": "Set to 1 to automatically load files indexed by Subversion version control."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Explicit subdirectory path relative to the project root to load manually."
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "Whether to scan the specified directory recursively for files."
+          },
+          "filters": {
+            "type": "array",
+            "description": "Glob file extensions/patterns to match against when loading the specified directory manually.",
+            "items": {
+              "type": "string",
+              "example": "*.cpp"
+            }
+          }
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "description": "Configuration targets for Kate's Build Plugin.",
+      "additionalProperties": true,
+      "properties": {
+        "directory": {
+          "type": "string",
+          "description": "The directory where execution commands will run."
+        },
+        "build": {
+          "type": "string",
+          "description": "The command string utilized for standard project compilation."
+        },
+        "quick": {
+          "type": "string",
+          "description": "The command string utilized for partial or rapid compilation."
+        },
+        "clean": {
+          "type": "string",
+          "description": "The command string utilized to delete build artifacts."
+        }
+      }
+    },
+    "formatting": {
+      "type": "object",
+      "description": "Configuration overrides for Kate's external formatting engine plugin.",
+      "additionalProperties": true,
+      "properties": {
+        "formatOnSave": {
+          "type": "boolean",
+          "description": "Enables or disables auto-formatting the file active view anytime a save event triggers."
+        }
+      },
+      "patternProperties": {
+        "^formatterFor[a-zA-Z0-9+_#-]+$": {
+          "type": "string",
+          "description": "Specifies the target binary layout mapping for a specific programming language extension type (e.g., formatterForJson: 'jq')."
+        }
+      }
+    },
+    "lspclient": {
+      "type": "object",
+      "description": "Project-specific Language Server Protocol (LSP) client overrides.",
+      "properties": {
+        "servers": {
+          "type": "object",
+          "description": "Dictionary of language server keys (e.g., 'python', 'rust', 'cpp').",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "array",
+                "description": "Command and arguments to start the LSP server. Supports Kate variable expansion.",
+                "items": { "type": "string" }
+              },
+              "commandDebug": {
+                "type": "array",
+                "description": "Command and arguments used to run the server in a debugging mode.",
+                "items": { "type": "string" }
+              },
+              "root": {
+                "type": "string",
+                "description": "The root path of the language server workspace. Relative to projectBase if not absolute."
+              },
+              "rootIndicationFileNames": {
+                "type": "array",
+                "description": "Files that specify a project root folder (e.g., ['package.json', 'Cargo.toml']).",
+                "items": { "type": "string" }
+              },
+              "url": {
+                "type": "string",
+                "description": "Reference URL pointing to the language server plugin repository."
+              },
+              "highlightingModeRegex": {
+                "type": "string",
+                "description": "Regex matching Kate's syntax highlighting names to map files to this server."
+              },
+              "use": {
+                "type": "string",
+                "description": "Allows a language variant to inherit from an existing base definition (e.g., 'deno-ts' using 'deno-js')."
+              },
+              "initializationOptions": {
+                "type": "object",
+                "description": "Arbitrary options passed straight to the LSP initialization object."
+              },
+              "settings": {
+                "type": "object",
+                "description": "Dynamic configuration settings pushed down to the active LSP instance."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

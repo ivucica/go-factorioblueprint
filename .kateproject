@@ -1,0 +1,52 @@
+{
+  "$schema": "./kateproject.schema.json",
+  "name": "Factorio Blueprint",
+  "files": [
+    {
+      "git": 1
+    },
+    {
+      "svn": 0
+    },
+    {
+      "hg": 0
+    },
+
+    {
+      "directory": ".",
+      "filters": [ "*.go", "go.mod", "go.sum" ],
+      "recursive": true
+    }
+  ],
+
+  "formatting": {
+    "formatOnSave": true
+  },
+
+  "lspclient": {
+    "servers": {
+      "go": {
+        "initializationOptions": {
+          "codelenses": {
+            "test": true,
+            "generate": true,
+            "regenerate_cgo": true,
+            "tidy": true,
+            "upgrade_dependency": true,
+            "vendor": true
+          }
+        },
+        "settings": {
+          "gopls": {
+            "buildFlags": ["-tags=tools"]
+          },
+          "env": [
+            "GOPROXY=direct",
+            "GOPATH=%{Project:NativePath}/../../../../"
+          ]
+        }
+      }
+    }
+  }
+
+}
