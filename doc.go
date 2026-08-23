@@ -25,4 +25,6 @@
 //     $ blueprintread -fmt=yaml -file read_blueprint/simple.txt
 //
 // README BUG: Above should be bash codeblocks, but goreadme always uses Go.
+//
+// NOTE: README.md is generated from doc.go. Please update doc.go rather than README directly.
 package factorioblueprint // badc0de.net/pkg/factorioblueprint
