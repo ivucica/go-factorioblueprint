@@ -14,7 +14,7 @@ if [[ ! -e ../../../github.com/Redcrafter/verilog2factorio ]] ; then
   mkdir -p ../../../github.com/Redcrafter/
   (
     cd ../../../github.com/Redcrafter/
-    git clone github.com/Redcrafter/verilog2factorio
+    git clone https://github.com/Redcrafter/verilog2factorio
     cd verilog2factorio/
     npm install
   )
