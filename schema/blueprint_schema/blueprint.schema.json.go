@@ -61,13 +61,42 @@ type Blueprint struct {
 	Version int `json:"version" yaml:"version" mapstructure:"version"`
 }
 
-// An object representing a Factorio blueprint book.
-type BlueprintBook struct {
+type BlueprintBook interface{}
+
+type BlueprintBookContent struct {
+	// ActiveIndex corresponds to the JSON schema field "active_index".
+	ActiveIndex int `json:"active_index,omitempty" yaml:"active_index,omitempty" mapstructure:"active_index,omitempty"`
+
+	// Blueprints corresponds to the JSON schema field "blueprints".
+	Blueprints []interface{} `json:"blueprints" yaml:"blueprints" mapstructure:"blueprints"`
+
+	// Description corresponds to the JSON schema field "description".
+	Description string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+
+	// Icons corresponds to the JSON schema field "icons".
+	Icons []Icon `json:"icons,omitempty" yaml:"icons,omitempty" mapstructure:"icons,omitempty"`
+
+	// Item corresponds to the JSON schema field "item".
+	Item string `json:"item" yaml:"item" mapstructure:"item"`
+
+	// Label corresponds to the JSON schema field "label".
+	Label string `json:"label,omitempty" yaml:"label,omitempty" mapstructure:"label,omitempty"`
+
+	// LabelColor corresponds to the JSON schema field "label_color".
+	LabelColor *Color `json:"label_color,omitempty" yaml:"label_color,omitempty" mapstructure:"label_color,omitempty"`
+
+	// Version corresponds to the JSON schema field "version".
+	Version int `json:"version" yaml:"version" mapstructure:"version"`
+}
+
+// An object representing a Factorio blueprint book. (Legacy Factorio 1.x blueprint
+// book structure.)
+type BlueprintBookV1 struct {
 	// Index of the currently selected blueprint, 0-based.
 	ActiveIndex *int `json:"active_index,omitempty" yaml:"active_index,omitempty" mapstructure:"active_index,omitempty"`
 
 	// The content of the blueprint book.
-	Blueprints []BlueprintBookBlueprintsElem `json:"blueprints" yaml:"blueprints" mapstructure:"blueprints"`
+	Blueprints []BlueprintBookV1BlueprintsElem `json:"blueprints" yaml:"blueprints" mapstructure:"blueprints"`
 
 	// An optional description of the blueprint book.
 	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
@@ -76,7 +105,7 @@ type BlueprintBook struct {
 	Icons []Icon `json:"icons,omitempty" yaml:"icons,omitempty" mapstructure:"icons,omitempty"`
 
 	// The name of the item; usually 'blueprint-book' in vanilla Factorio.
-	Item BlueprintBookItem `json:"item" yaml:"item" mapstructure:"item"`
+	Item BlueprintBookV1Item `json:"item" yaml:"item" mapstructure:"item"`
 
 	// The user-defined name of the blueprint book.
 	Label *string `json:"label,omitempty" yaml:"label,omitempty" mapstructure:"label,omitempty"`
@@ -89,7 +118,7 @@ type BlueprintBook struct {
 }
 
 // An array containing the blueprints included in the book.
-type BlueprintBookBlueprintsElem struct {
+type BlueprintBookV1BlueprintsElem struct {
 	// A blueprint object.
 	Blueprint Blueprint `json:"blueprint" yaml:"blueprint" mapstructure:"blueprint"`
 
@@ -97,9 +126,18 @@ type BlueprintBookBlueprintsElem struct {
 	Index int `json:"index" yaml:"index" mapstructure:"index"`
 }
 
-type BlueprintBookItem string
+type BlueprintBookV1Item string
 
-const BlueprintBookItemBlueprintBook BlueprintBookItem = "blueprint-book"
+const BlueprintBookV1ItemBlueprintBook BlueprintBookV1Item = "blueprint-book"
+
+// Factorio 2.0 blueprint book structure (wrapped).
+type BlueprintBookV2 struct {
+	// BlueprintBook corresponds to the JSON schema field "blueprint_book".
+	BlueprintBook BlueprintBookContent `json:"blueprint_book" yaml:"blueprint_book" mapstructure:"blueprint_book"`
+
+	// Index corresponds to the JSON schema field "index".
+	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
+}
 
 // A filter used in control behavior.
 type BlueprintLogisticFilter struct {
@@ -136,8 +174,10 @@ type BlueprintSchemaJSON struct {
 	Blueprint *Blueprint `json:"blueprint,omitempty" yaml:"blueprint,omitempty" mapstructure:"blueprint,omitempty"`
 
 	// BlueprintBook corresponds to the JSON schema field "blueprint-book".
-	BlueprintBook *BlueprintBook `json:"blueprint-book,omitempty" yaml:"blueprint-book,omitempty" mapstructure:"blueprint-book,omitempty"`
+	BlueprintBook BlueprintSchemaJSONBlueprintBook `json:"blueprint-book,omitempty" yaml:"blueprint-book,omitempty" mapstructure:"blueprint-book,omitempty"`
 }
+
+type BlueprintSchemaJSONBlueprintBook interface{}
 
 // A color with RGBA components.
 type Color struct {
@@ -254,6 +294,58 @@ type DeciderConditions struct {
 	SecondSignal *SignalID `json:"second_signal,omitempty" yaml:"second_signal,omitempty" mapstructure:"second_signal,omitempty"`
 }
 
+type DeconstructionPlanner struct {
+	// DeconstructionPlanner corresponds to the JSON schema field
+	// "deconstruction_planner".
+	DeconstructionPlanner *DeconstructionPlannerDeconstructionPlanner `json:"deconstruction_planner,omitempty" yaml:"deconstruction_planner,omitempty" mapstructure:"deconstruction_planner,omitempty"`
+
+	// Index corresponds to the JSON schema field "index".
+	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
+}
+
+type DeconstructionPlannerDeconstructionPlanner struct {
+	// Item corresponds to the JSON schema field "item".
+	Item interface{} `json:"item,omitempty" yaml:"item,omitempty" mapstructure:"item,omitempty"`
+
+	// Label corresponds to the JSON schema field "label".
+	Label string `json:"label,omitempty" yaml:"label,omitempty" mapstructure:"label,omitempty"`
+
+	// LabelColor corresponds to the JSON schema field "label_color".
+	LabelColor *Color `json:"label_color,omitempty" yaml:"label_color,omitempty" mapstructure:"label_color,omitempty"`
+
+	// Settings corresponds to the JSON schema field "settings".
+	Settings *DeconstructionPlannerDeconstructionPlannerSettings `json:"settings,omitempty" yaml:"settings,omitempty" mapstructure:"settings,omitempty"`
+
+	// Version corresponds to the JSON schema field "version".
+	Version *int `json:"version,omitempty" yaml:"version,omitempty" mapstructure:"version,omitempty"`
+}
+
+type DeconstructionPlannerDeconstructionPlannerSettings struct {
+	// Description corresponds to the JSON schema field "description".
+	Description string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+
+	// EntityFilterMode corresponds to the JSON schema field "entity_filter_mode".
+	EntityFilterMode *string `json:"entity_filter_mode,omitempty" yaml:"entity_filter_mode,omitempty" mapstructure:"entity_filter_mode,omitempty"`
+
+	// EntityFilters corresponds to the JSON schema field "entity_filters".
+	EntityFilters []interface{} `json:"entity_filters,omitempty" yaml:"entity_filters,omitempty" mapstructure:"entity_filters,omitempty"`
+
+	// Icons corresponds to the JSON schema field "icons".
+	Icons interface{} `json:"icons,omitempty" yaml:"icons,omitempty" mapstructure:"icons,omitempty"`
+
+	// TileFilterMode corresponds to the JSON schema field "tile_filter_mode".
+	TileFilterMode *string `json:"tile_filter_mode,omitempty" yaml:"tile_filter_mode,omitempty" mapstructure:"tile_filter_mode,omitempty"`
+
+	// TileFilters corresponds to the JSON schema field "tile_filters".
+	TileFilters []interface{} `json:"tile_filters,omitempty" yaml:"tile_filters,omitempty" mapstructure:"tile_filters,omitempty"`
+
+	// TileSelectionMode corresponds to the JSON schema field "tile_selection_mode".
+	TileSelectionMode int `json:"tile_selection_mode,omitempty" yaml:"tile_selection_mode,omitempty" mapstructure:"tile_selection_mode,omitempty"`
+
+	// TreesAndRocksOnly corresponds to the JSON schema field "trees_and_rocks_only".
+	TreesAndRocksOnly bool `json:"trees_and_rocks_only,omitempty" yaml:"trees_and_rocks_only,omitempty" mapstructure:"trees_and_rocks_only,omitempty"`
+}
+
 // An entity placed within the blueprint.
 type Entity struct {
 	// Used by Programmable Speaker (optional).
@@ -278,7 +370,7 @@ type Entity struct {
 	// Control behavior of this entity (optional).
 	ControlBehavior *ControlBehavior `json:"control_behavior,omitempty" yaml:"control_behavior,omitempty" mapstructure:"control_behavior,omitempty"`
 
-	// Direction of the entity, uint (optional).
+	// Direction of the entity (0-15 for Factorio 2.0).
 	Direction *int `json:"direction,omitempty" yaml:"direction,omitempty" mapstructure:"direction,omitempty"`
 
 	// Drop position the inserter is set to (optional).
@@ -306,10 +398,13 @@ type Entity struct {
 	Inventory *Inventory `json:"inventory,omitempty" yaml:"inventory,omitempty" mapstructure:"inventory,omitempty"`
 
 	// Item requests by this entity (optional).
-	Items ItemRequest `json:"items,omitempty" yaml:"items,omitempty" mapstructure:"items,omitempty"`
+	Items interface{} `json:"items,omitempty" yaml:"items,omitempty" mapstructure:"items,omitempty"`
 
 	// Manually set train limit of the train station (optional).
 	ManualTrainsLimit *int `json:"manual_trains_limit,omitempty" yaml:"manual_trains_limit,omitempty" mapstructure:"manual_trains_limit,omitempty"`
+
+	// (Factorio 2.0) Whether or not the input/output fluid boxes are mirrored.
+	Mirror bool `json:"mirror,omitempty" yaml:"mirror,omitempty" mapstructure:"mirror,omitempty"`
 
 	// Prototype name of the entity (e.g., "offshore-pump").
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
@@ -337,6 +432,9 @@ type Entity struct {
 
 	// Position of the entity within the blueprint.
 	Position Position `json:"position" yaml:"position" mapstructure:"position"`
+
+	// (Factorio 2.0) The quality of the entity.
+	Quality string `json:"quality,omitempty" yaml:"quality,omitempty" mapstructure:"quality,omitempty"`
 
 	// Name of the recipe prototype this assembling machine is set to (optional).
 	Recipe *string `json:"recipe,omitempty" yaml:"recipe,omitempty" mapstructure:"recipe,omitempty"`
@@ -392,80 +490,129 @@ type EntityType string
 const EntityTypeInput EntityType = "input"
 const EntityTypeOutput EntityType = "output"
 
-// A filter within a section.
-type Filter struct {
-	// Comparator used for filtering.
-	Comparator string `json:"comparator" yaml:"comparator" mapstructure:"comparator"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SignalID) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in SignalID: required")
+	}
+	type Plain SignalID
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SignalID(plain)
+	return nil
+}
 
-	// Count threshold for the filter.
-	Count int `json:"count" yaml:"count" mapstructure:"count"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *Section) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["filters"]; !ok || v == nil {
+		return fmt.Errorf("field filters in Section: required")
+	}
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Section: required")
+	}
+	type Plain Section
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = Section(plain)
+	return nil
+}
 
-	// Index of the filter.
+// A section within the control behavior.
+type Section struct {
+	// Filters within the section.
+	Filters []Filter `json:"filters" yaml:"filters" mapstructure:"filters"`
+
+	// Index of the section.
 	Index int `json:"index" yaml:"index" mapstructure:"index"`
-
-	// Name of the filtered item.
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// Quality level of the item.
-	Quality *string `json:"quality,omitempty" yaml:"quality,omitempty" mapstructure:"quality,omitempty"`
 }
 
-// An icon representing an item, fluid, or virtual signal.
-type Icon struct {
-	// The 1-based index of the icon.
-	Index int `json:"index" yaml:"index" mapstructure:"index"`
+// A position in 2D space.
+type Position struct {
+	// The x-coordinate.
+	X float64 `json:"x" yaml:"x" mapstructure:"x"`
 
-	// The signal used as the icon.
-	Signal SignalID `json:"signal" yaml:"signal" mapstructure:"signal"`
+	// The y-coordinate.
+	Y float64 `json:"y" yaml:"y" mapstructure:"y"`
 }
 
-// A filter for Infinity container items.
-type InfinityFilter struct {
-	// Desired item count.
-	Count *int `json:"count,omitempty" yaml:"count,omitempty" mapstructure:"count,omitempty"`
-
-	// 1-based index of the filter.
-	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
-
-	// Mode defining how item count is maintained.
-	Mode *InfinityFilterMode `json:"mode,omitempty" yaml:"mode,omitempty" mapstructure:"mode,omitempty"`
-
-	// Name of the item prototype.
-	Name *string `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
-}
-
-type InfinityFilterMode string
-
-const InfinityFilterModeAtLeast InfinityFilterMode = "at-least"
-const InfinityFilterModeAtMost InfinityFilterMode = "at-most"
-const InfinityFilterModeExactly InfinityFilterMode = "exactly"
-
-// Settings for Infinity containers.
-type InfinitySettings struct {
-	// Filters specifying item settings.
-	Filters []InfinityFilter `json:"filters,omitempty" yaml:"filters,omitempty" mapstructure:"filters,omitempty"`
-
-	// Whether to remove items not specified in the filters.
-	RemoveUnfilteredItems *bool `json:"remove_unfiltered_items,omitempty" yaml:"remove_unfiltered_items,omitempty" mapstructure:"remove_unfiltered_items,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *Position) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["x"]; !ok || v == nil {
+		return fmt.Errorf("field x in Position: required")
+	}
+	if v, ok := raw["y"]; !ok || v == nil {
+		return fmt.Errorf("field y in Position: required")
+	}
+	type Plain Position
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = Position(plain)
+	return nil
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *EntityType) UnmarshalYAML(value *yaml.Node) error {
-	var v string
-	if err := value.Decode(&v); err != nil {
+func (j *Position) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
 		return err
 	}
-	var ok bool
-	for _, expected := range enumValues_EntityType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
+	if v, ok := raw["x"]; !ok || v == nil {
+		return fmt.Errorf("field x in Position: required")
 	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityType, v)
+	if v, ok := raw["y"]; !ok || v == nil {
+		return fmt.Errorf("field y in Position: required")
 	}
-	*j = EntityType(v)
+	type Plain Position
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = Position(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *Filter) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["comparator"]; !ok || v == nil {
+		return fmt.Errorf("field comparator in Filter: required")
+	}
+	if v, ok := raw["count"]; !ok || v == nil {
+		return fmt.Errorf("field count in Filter: required")
+	}
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Filter: required")
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in Filter: required")
+	}
+	type Plain Filter
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = Filter(plain)
 	return nil
 }
 
@@ -515,55 +662,51 @@ func (j *EntityFilterMode) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *Position) UnmarshalJSON(b []byte) error {
+func (j *Filter) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
-	if v, ok := raw["x"]; !ok || v == nil {
-		return fmt.Errorf("field x in Position: required")
+	if v, ok := raw["comparator"]; !ok || v == nil {
+		return fmt.Errorf("field comparator in Filter: required")
 	}
-	if v, ok := raw["y"]; !ok || v == nil {
-		return fmt.Errorf("field y in Position: required")
+	if v, ok := raw["count"]; !ok || v == nil {
+		return fmt.Errorf("field count in Filter: required")
 	}
-	type Plain Position
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Filter: required")
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in Filter: required")
+	}
+	type Plain Filter
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	*j = Position(plain)
+	*j = Filter(plain)
 	return nil
 }
 
-// A position in 2D space.
-type Position struct {
-	// The x-coordinate.
-	X float64 `json:"x" yaml:"x" mapstructure:"x"`
+// A filter within a section.
+type Filter struct {
+	// Comparator used for filtering.
+	Comparator string `json:"comparator" yaml:"comparator" mapstructure:"comparator"`
 
-	// The y-coordinate.
-	Y float64 `json:"y" yaml:"y" mapstructure:"y"`
+	// Count threshold for the filter.
+	Count int `json:"count" yaml:"count" mapstructure:"count"`
+
+	// Index of the filter.
+	Index int `json:"index" yaml:"index" mapstructure:"index"`
+
+	// Name of the filtered item.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Quality level of the item.
+	Quality *string `json:"quality,omitempty" yaml:"quality,omitempty" mapstructure:"quality,omitempty"`
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *Section) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["filters"]; !ok || v == nil {
-		return fmt.Errorf("field filters in Section: required")
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Section: required")
-	}
-	type Plain Section
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = Section(plain)
-	return nil
-}
+type InfinityFilterMode string
 
 var enumValues_InfinityFilterMode = []interface{}{
 	"at-least",
@@ -611,91 +754,33 @@ func (j *InfinityFilterMode) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *Section) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["filters"]; !ok || v == nil {
-		return fmt.Errorf("field filters in Section: required")
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Section: required")
-	}
-	type Plain Section
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = Section(plain)
-	return nil
+const InfinityFilterModeAtLeast InfinityFilterMode = "at-least"
+const InfinityFilterModeAtMost InfinityFilterMode = "at-most"
+const InfinityFilterModeExactly InfinityFilterMode = "exactly"
+
+// A filter for Infinity container items.
+type InfinityFilter struct {
+	// Desired item count.
+	Count *int `json:"count,omitempty" yaml:"count,omitempty" mapstructure:"count,omitempty"`
+
+	// 1-based index of the filter.
+	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
+
+	// Mode defining how item count is maintained.
+	Mode *InfinityFilterMode `json:"mode,omitempty" yaml:"mode,omitempty" mapstructure:"mode,omitempty"`
+
+	// Name of the item prototype.
+	Name *string `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
 }
 
-// A section within the control behavior.
-type Section struct {
-	// Filters within the section.
-	Filters []Filter `json:"filters" yaml:"filters" mapstructure:"filters"`
+// Settings for Infinity containers.
+type InfinitySettings struct {
+	// Filters specifying item settings.
+	Filters []InfinityFilter `json:"filters,omitempty" yaml:"filters,omitempty" mapstructure:"filters,omitempty"`
 
-	// Index of the section.
-	Index int `json:"index" yaml:"index" mapstructure:"index"`
+	// Whether to remove items not specified in the filters.
+	RemoveUnfilteredItems *bool `json:"remove_unfiltered_items,omitempty" yaml:"remove_unfiltered_items,omitempty" mapstructure:"remove_unfiltered_items,omitempty"`
 }
-
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *Filter) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["comparator"]; !ok || v == nil {
-		return fmt.Errorf("field comparator in Filter: required")
-	}
-	if v, ok := raw["count"]; !ok || v == nil {
-		return fmt.Errorf("field count in Filter: required")
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Filter: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in Filter: required")
-	}
-	type Plain Filter
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = Filter(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *Filter) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["comparator"]; !ok || v == nil {
-		return fmt.Errorf("field comparator in Filter: required")
-	}
-	if v, ok := raw["count"]; !ok || v == nil {
-		return fmt.Errorf("field count in Filter: required")
-	}
-	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in Filter: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in Filter: required")
-	}
-	type Plain Filter
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = Filter(plain)
-	return nil
-}
-
-type SignalIDType string
 
 // UnmarshalYAML implements yaml.Unmarshaler.
 func (j *ConnectionData) UnmarshalYAML(value *yaml.Node) error {
@@ -801,9 +886,6 @@ func (j *Color) UnmarshalYAML(value *yaml.Node) error {
 	*j = Color(plain)
 	return nil
 }
-
-// Item requests by the entity for construction.
-type ItemRequest map[string]int
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Color) UnmarshalJSON(b []byte) error {
@@ -984,23 +1066,22 @@ func (j *EntityType) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *Position) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
+func (j *EntityType) UnmarshalYAML(value *yaml.Node) error {
+	var v string
+	if err := value.Decode(&v); err != nil {
 		return err
 	}
-	if v, ok := raw["x"]; !ok || v == nil {
-		return fmt.Errorf("field x in Position: required")
+	var ok bool
+	for _, expected := range enumValues_EntityType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
 	}
-	if v, ok := raw["y"]; !ok || v == nil {
-		return fmt.Errorf("field y in Position: required")
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_EntityType, v)
 	}
-	type Plain Position
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = Position(plain)
+	*j = EntityType(v)
 	return nil
 }
 
@@ -1019,6 +1100,8 @@ type SpeakerAlertParameters struct {
 	ShowOnMap *bool `json:"show_on_map,omitempty" yaml:"show_on_map,omitempty" mapstructure:"show_on_map,omitempty"`
 }
 
+type SignalIDType string
+
 // UnmarshalYAML implements yaml.Unmarshaler.
 func (j *SignalID) UnmarshalYAML(value *yaml.Node) error {
 	var raw map[string]interface{}
@@ -1031,24 +1114,6 @@ func (j *SignalID) UnmarshalYAML(value *yaml.Node) error {
 	type Plain SignalID
 	var plain Plain
 	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = SignalID(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SignalID) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in SignalID: required")
-	}
-	type Plain SignalID
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
 	*j = SignalID(plain)
@@ -1075,6 +1140,12 @@ func (j *Entity) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
+	if v, ok := raw["mirror"]; !ok || v == nil {
+		plain.Mirror = false
+	}
+	if v, ok := raw["quality"]; !ok || v == nil {
+		plain.Quality = "normal"
+	}
 	*j = Entity(plain)
 	return nil
 }
@@ -1099,17 +1170,23 @@ func (j *Entity) UnmarshalYAML(value *yaml.Node) error {
 	if err := value.Decode(&plain); err != nil {
 		return err
 	}
+	if v, ok := raw["mirror"]; !ok || v == nil {
+		plain.Mirror = false
+	}
+	if v, ok := raw["quality"]; !ok || v == nil {
+		plain.Quality = "normal"
+	}
 	*j = Entity(plain)
 	return nil
 }
 
-// An identifier for a signal in the game.
-type SignalID struct {
-	// The name of the signal.
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
+// An icon representing an item, fluid, or virtual signal.
+type Icon struct {
+	// The 1-based index of the icon.
+	Index int `json:"index" yaml:"index" mapstructure:"index"`
 
-	// The type of the signal.
-	Type *SignalIDType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
+	// The signal used as the icon.
+	Signal SignalID `json:"signal" yaml:"signal" mapstructure:"signal"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1289,7 +1366,26 @@ func (j *Tile) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-const SignalIDTypeVirtual SignalIDType = "virtual"
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *Section) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["filters"]; !ok || v == nil {
+		return fmt.Errorf("field filters in Section: required")
+	}
+	if v, ok := raw["index"]; !ok || v == nil {
+		return fmt.Errorf("field index in Section: required")
+	}
+	type Plain Section
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = Section(plain)
+	return nil
+}
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Blueprint) UnmarshalJSON(b []byte) error {
@@ -1345,93 +1441,356 @@ func (j *Blueprint) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-const SignalIDTypeFluid SignalIDType = "fluid"
+// An identifier for a signal in the game.
+type SignalID struct {
+	// The name of the signal.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The quality associated with this signal (Factorio 2.0).
+	Quality *string `json:"quality,omitempty" yaml:"quality,omitempty" mapstructure:"quality,omitempty"`
+
+	// The type of the signal (expanded for Factorio 2.0).
+	Type *SignalIDType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
+}
+
+const SignalIDTypeQuality SignalIDType = "quality"
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *BlueprintBookBlueprintsElem) UnmarshalJSON(b []byte) error {
+func (j *BlueprintBookContent) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["blueprints"]; !ok || v == nil {
+		return fmt.Errorf("field blueprints in BlueprintBookContent: required")
+	}
+	if v, ok := raw["item"]; !ok || v == nil {
+		return fmt.Errorf("field item in BlueprintBookContent: required")
+	}
+	if v, ok := raw["version"]; !ok || v == nil {
+		return fmt.Errorf("field version in BlueprintBookContent: required")
+	}
+	type Plain BlueprintBookContent
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["active_index"]; !ok || v == nil {
+		plain.ActiveIndex = 0.0
+	}
+	if v, ok := raw["description"]; !ok || v == nil {
+		plain.Description = ""
+	}
+	if len(plain.Icons) > 4 {
+		return fmt.Errorf("field %s length: must be <= %d", "icons", 4)
+	}
+	if v, ok := raw["label"]; !ok || v == nil {
+		plain.Label = ""
+	}
+	*j = BlueprintBookContent(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *BlueprintBookContent) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["blueprints"]; !ok || v == nil {
+		return fmt.Errorf("field blueprints in BlueprintBookContent: required")
+	}
+	if v, ok := raw["item"]; !ok || v == nil {
+		return fmt.Errorf("field item in BlueprintBookContent: required")
+	}
+	if v, ok := raw["version"]; !ok || v == nil {
+		return fmt.Errorf("field version in BlueprintBookContent: required")
+	}
+	type Plain BlueprintBookContent
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	if v, ok := raw["active_index"]; !ok || v == nil {
+		plain.ActiveIndex = 0.0
+	}
+	if v, ok := raw["description"]; !ok || v == nil {
+		plain.Description = ""
+	}
+	if len(plain.Icons) > 4 {
+		return fmt.Errorf("field %s length: must be <= %d", "icons", 4)
+	}
+	if v, ok := raw["label"]; !ok || v == nil {
+		plain.Label = ""
+	}
+	*j = BlueprintBookContent(plain)
+	return nil
+}
+
+const SignalIDTypeAsteroidChunk SignalIDType = "asteroid-chunk"
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *BlueprintBookV1BlueprintsElem) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
 	if v, ok := raw["blueprint"]; !ok || v == nil {
-		return fmt.Errorf("field blueprint in BlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field blueprint in BlueprintBookV1BlueprintsElem: required")
 	}
 	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in BlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field index in BlueprintBookV1BlueprintsElem: required")
 	}
-	type Plain BlueprintBookBlueprintsElem
+	type Plain BlueprintBookV1BlueprintsElem
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	*j = BlueprintBookBlueprintsElem(plain)
+	*j = BlueprintBookV1BlueprintsElem(plain)
 	return nil
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *BlueprintBookBlueprintsElem) UnmarshalYAML(value *yaml.Node) error {
+func (j *BlueprintBookV1BlueprintsElem) UnmarshalYAML(value *yaml.Node) error {
 	var raw map[string]interface{}
 	if err := value.Decode(&raw); err != nil {
 		return err
 	}
 	if v, ok := raw["blueprint"]; !ok || v == nil {
-		return fmt.Errorf("field blueprint in BlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field blueprint in BlueprintBookV1BlueprintsElem: required")
 	}
 	if v, ok := raw["index"]; !ok || v == nil {
-		return fmt.Errorf("field index in BlueprintBookBlueprintsElem: required")
+		return fmt.Errorf("field index in BlueprintBookV1BlueprintsElem: required")
 	}
-	type Plain BlueprintBookBlueprintsElem
+	type Plain BlueprintBookV1BlueprintsElem
 	var plain Plain
 	if err := value.Decode(&plain); err != nil {
 		return err
 	}
-	*j = BlueprintBookBlueprintsElem(plain)
+	*j = BlueprintBookV1BlueprintsElem(plain)
 	return nil
 }
 
-const SignalIDTypeItem SignalIDType = "item"
+const SignalIDTypeSpaceLocation SignalIDType = "space-location"
 
-var enumValues_BlueprintBookItem = []interface{}{
+var enumValues_BlueprintBookV1Item = []interface{}{
 	"blueprint-book",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *BlueprintBookItem) UnmarshalJSON(b []byte) error {
+func (j *BlueprintBookV1Item) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_BlueprintBookItem {
+	for _, expected := range enumValues_BlueprintBookV1Item {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintBookItem, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintBookV1Item, v)
 	}
-	*j = BlueprintBookItem(v)
+	*j = BlueprintBookV1Item(v)
 	return nil
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (j *BlueprintBookItem) UnmarshalYAML(value *yaml.Node) error {
+func (j *BlueprintBookV1Item) UnmarshalYAML(value *yaml.Node) error {
 	var v string
 	if err := value.Decode(&v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_BlueprintBookItem {
+	for _, expected := range enumValues_BlueprintBookV1Item {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintBookItem, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_BlueprintBookV1Item, v)
 	}
-	*j = BlueprintBookItem(v)
+	*j = BlueprintBookV1Item(v)
+	return nil
+}
+
+const SignalIDTypeEntity SignalIDType = "entity"
+const SignalIDTypeRecipe SignalIDType = "recipe"
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *BlueprintBookV1) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["blueprints"]; !ok || v == nil {
+		return fmt.Errorf("field blueprints in BlueprintBookV1: required")
+	}
+	if v, ok := raw["item"]; !ok || v == nil {
+		return fmt.Errorf("field item in BlueprintBookV1: required")
+	}
+	if v, ok := raw["version"]; !ok || v == nil {
+		return fmt.Errorf("field version in BlueprintBookV1: required")
+	}
+	type Plain BlueprintBookV1
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = BlueprintBookV1(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *BlueprintBookV1) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["blueprints"]; !ok || v == nil {
+		return fmt.Errorf("field blueprints in BlueprintBookV1: required")
+	}
+	if v, ok := raw["item"]; !ok || v == nil {
+		return fmt.Errorf("field item in BlueprintBookV1: required")
+	}
+	if v, ok := raw["version"]; !ok || v == nil {
+		return fmt.Errorf("field version in BlueprintBookV1: required")
+	}
+	type Plain BlueprintBookV1
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = BlueprintBookV1(plain)
+	return nil
+}
+
+const SignalIDTypeVirtual SignalIDType = "virtual"
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *BlueprintBookV2) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["blueprint_book"]; !ok || v == nil {
+		return fmt.Errorf("field blueprint_book in BlueprintBookV2: required")
+	}
+	type Plain BlueprintBookV2
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = BlueprintBookV2(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *BlueprintBookV2) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["blueprint_book"]; !ok || v == nil {
+		return fmt.Errorf("field blueprint_book in BlueprintBookV2: required")
+	}
+	type Plain BlueprintBookV2
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = BlueprintBookV2(plain)
+	return nil
+}
+
+const SignalIDTypeFluid SignalIDType = "fluid"
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *DeconstructionPlannerDeconstructionPlannerSettings) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain DeconstructionPlannerDeconstructionPlannerSettings
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["description"]; !ok || v == nil {
+		plain.Description = ""
+	}
+	if v, ok := raw["tile_selection_mode"]; !ok || v == nil {
+		plain.TileSelectionMode = 0.0
+	}
+	if v, ok := raw["trees_and_rocks_only"]; !ok || v == nil {
+		plain.TreesAndRocksOnly = false
+	}
+	*j = DeconstructionPlannerDeconstructionPlannerSettings(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *DeconstructionPlannerDeconstructionPlannerSettings) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	type Plain DeconstructionPlannerDeconstructionPlannerSettings
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	if v, ok := raw["description"]; !ok || v == nil {
+		plain.Description = ""
+	}
+	if v, ok := raw["tile_selection_mode"]; !ok || v == nil {
+		plain.TileSelectionMode = 0.0
+	}
+	if v, ok := raw["trees_and_rocks_only"]; !ok || v == nil {
+		plain.TreesAndRocksOnly = false
+	}
+	*j = DeconstructionPlannerDeconstructionPlannerSettings(plain)
+	return nil
+}
+
+const SignalIDTypeItem SignalIDType = "item"
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *DeconstructionPlannerDeconstructionPlanner) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain DeconstructionPlannerDeconstructionPlanner
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["label"]; !ok || v == nil {
+		plain.Label = ""
+	}
+	*j = DeconstructionPlannerDeconstructionPlanner(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *DeconstructionPlannerDeconstructionPlanner) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	type Plain DeconstructionPlannerDeconstructionPlanner
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	if v, ok := raw["label"]; !ok || v == nil {
+		plain.Label = ""
+	}
+	*j = DeconstructionPlannerDeconstructionPlanner(plain)
 	return nil
 }
 
@@ -1455,6 +1814,415 @@ func (j *SignalIDType) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+// Name of a valid Factorio entity/item.
+type MapperIDName string
+
+type FromMapperIDType interface{}
+
+type FromMapperID struct {
+	// The comparator for quality. nil if any quality.
+	Comparator *string `json:"comparator,omitempty" yaml:"comparator,omitempty" mapstructure:"comparator,omitempty"`
+
+	// Name corresponds to the JSON schema field "name".
+	Name *MapperIDName `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
+
+	// The prototype name of the quality. nil for any quality.
+	Quality *string `json:"quality,omitempty" yaml:"quality,omitempty" mapstructure:"quality,omitempty"`
+
+	// Type corresponds to the JSON schema field "type".
+	Type FromMapperIDType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
+}
+
+type QualityName string
+
+type ItemAndQualityID struct {
+	// Name corresponds to the JSON schema field "name".
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Quality corresponds to the JSON schema field "quality".
+	Quality *QualityName `json:"quality,omitempty" yaml:"quality,omitempty" mapstructure:"quality,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ItemAndQualityID) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in ItemAndQualityID: required")
+	}
+	type Plain ItemAndQualityID
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = ItemAndQualityID(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *ItemAndQualityID) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in ItemAndQualityID: required")
+	}
+	type Plain ItemAndQualityID
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = ItemAndQualityID(plain)
+	return nil
+}
+
+type InventoryPosition struct {
+	// Count corresponds to the JSON schema field "count".
+	Count int `json:"count,omitempty" yaml:"count,omitempty" mapstructure:"count,omitempty"`
+
+	// Inventory corresponds to the JSON schema field "inventory".
+	Inventory int `json:"inventory" yaml:"inventory" mapstructure:"inventory"`
+
+	// Stack corresponds to the JSON schema field "stack".
+	Stack int `json:"stack" yaml:"stack" mapstructure:"stack"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *InventoryPosition) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["inventory"]; !ok || v == nil {
+		return fmt.Errorf("field inventory in InventoryPosition: required")
+	}
+	if v, ok := raw["stack"]; !ok || v == nil {
+		return fmt.Errorf("field stack in InventoryPosition: required")
+	}
+	type Plain InventoryPosition
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["count"]; !ok || v == nil {
+		plain.Count = 1.0
+	}
+	*j = InventoryPosition(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *InventoryPosition) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["inventory"]; !ok || v == nil {
+		return fmt.Errorf("field inventory in InventoryPosition: required")
+	}
+	if v, ok := raw["stack"]; !ok || v == nil {
+		return fmt.Errorf("field stack in InventoryPosition: required")
+	}
+	type Plain InventoryPosition
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	if v, ok := raw["count"]; !ok || v == nil {
+		plain.Count = 1.0
+	}
+	*j = InventoryPosition(plain)
+	return nil
+}
+
+type ItemInventoryPositions struct {
+	// GridCount corresponds to the JSON schema field "grid_count".
+	GridCount int `json:"grid_count,omitempty" yaml:"grid_count,omitempty" mapstructure:"grid_count,omitempty"`
+
+	// InInventory corresponds to the JSON schema field "in_inventory".
+	InInventory []InventoryPosition `json:"in_inventory,omitempty" yaml:"in_inventory,omitempty" mapstructure:"in_inventory,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ItemInventoryPositions) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain ItemInventoryPositions
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["grid_count"]; !ok || v == nil {
+		plain.GridCount = 0.0
+	}
+	*j = ItemInventoryPositions(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *ItemInventoryPositions) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	type Plain ItemInventoryPositions
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	if v, ok := raw["grid_count"]; !ok || v == nil {
+		plain.GridCount = 0.0
+	}
+	*j = ItemInventoryPositions(plain)
+	return nil
+}
+
+type InsertPlan struct {
+	// ID corresponds to the JSON schema field "id".
+	ID ItemAndQualityID `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Items corresponds to the JSON schema field "items".
+	Items ItemInventoryPositions `json:"items" yaml:"items" mapstructure:"items"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *InsertPlan) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["id"]; !ok || v == nil {
+		return fmt.Errorf("field id in InsertPlan: required")
+	}
+	if v, ok := raw["items"]; !ok || v == nil {
+		return fmt.Errorf("field items in InsertPlan: required")
+	}
+	type Plain InsertPlan
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = InsertPlan(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *InsertPlan) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	if v, ok := raw["id"]; !ok || v == nil {
+		return fmt.Errorf("field id in InsertPlan: required")
+	}
+	if v, ok := raw["items"]; !ok || v == nil {
+		return fmt.Errorf("field items in InsertPlan: required")
+	}
+	type Plain InsertPlan
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	*j = InsertPlan(plain)
+	return nil
+}
+
+// Item requests by the entity for construction.
+type ItemRequest map[string]int
+
+type Mapper struct {
+	// Entity/item being converted from.
+	From interface{} `json:"from,omitempty" yaml:"from,omitempty" mapstructure:"from,omitempty"`
+
+	// Index of this particular mapper pair in the upgrade planner GUI, 1-indexed.
+	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
+
+	// Entity/item being converted to.
+	To interface{} `json:"to,omitempty" yaml:"to,omitempty" mapstructure:"to,omitempty"`
+}
+
+type MapperIDType string
+
+var enumValues_MapperIDType = []interface{}{
+	"entity",
+	"item",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *MapperIDType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_MapperIDType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_MapperIDType, v)
+	}
+	*j = MapperIDType(v)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *MapperIDType) UnmarshalYAML(value *yaml.Node) error {
+	var v string
+	if err := value.Decode(&v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_MapperIDType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_MapperIDType, v)
+	}
+	*j = MapperIDType(v)
+	return nil
+}
+
+const MapperIDTypeEntity MapperIDType = "entity"
+const MapperIDTypeItem MapperIDType = "item"
+
+type ToMapperIDType interface{}
+
+type ToMapperID struct {
+	// Name corresponds to the JSON schema field "name".
+	Name *MapperIDName `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
+
+	// (Factorio 2.0) Quality
+	Quality *string `json:"quality,omitempty" yaml:"quality,omitempty" mapstructure:"quality,omitempty"`
+
+	// Type corresponds to the JSON schema field "type".
+	Type ToMapperIDType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
+}
+
+type UpgradePlannerUpgradePlannerSettings struct {
+	// Description corresponds to the JSON schema field "description".
+	Description string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+
+	// Icons corresponds to the JSON schema field "icons".
+	Icons []Icon `json:"icons,omitempty" yaml:"icons,omitempty" mapstructure:"icons,omitempty"`
+
+	// Mappers corresponds to the JSON schema field "mappers".
+	Mappers []Mapper `json:"mappers,omitempty" yaml:"mappers,omitempty" mapstructure:"mappers,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *UpgradePlannerUpgradePlannerSettings) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain UpgradePlannerUpgradePlannerSettings
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["description"]; !ok || v == nil {
+		plain.Description = ""
+	}
+	if len(plain.Icons) > 4 {
+		return fmt.Errorf("field %s length: must be <= %d", "icons", 4)
+	}
+	*j = UpgradePlannerUpgradePlannerSettings(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *UpgradePlannerUpgradePlannerSettings) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	type Plain UpgradePlannerUpgradePlannerSettings
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	if v, ok := raw["description"]; !ok || v == nil {
+		plain.Description = ""
+	}
+	if len(plain.Icons) > 4 {
+		return fmt.Errorf("field %s length: must be <= %d", "icons", 4)
+	}
+	*j = UpgradePlannerUpgradePlannerSettings(plain)
+	return nil
+}
+
+type UpgradePlannerUpgradePlanner struct {
+	// Item corresponds to the JSON schema field "item".
+	Item interface{} `json:"item,omitempty" yaml:"item,omitempty" mapstructure:"item,omitempty"`
+
+	// Label corresponds to the JSON schema field "label".
+	Label string `json:"label,omitempty" yaml:"label,omitempty" mapstructure:"label,omitempty"`
+
+	// LabelColor corresponds to the JSON schema field "label_color".
+	LabelColor *Color `json:"label_color,omitempty" yaml:"label_color,omitempty" mapstructure:"label_color,omitempty"`
+
+	// Settings corresponds to the JSON schema field "settings".
+	Settings *UpgradePlannerUpgradePlannerSettings `json:"settings,omitempty" yaml:"settings,omitempty" mapstructure:"settings,omitempty"`
+
+	// Version corresponds to the JSON schema field "version".
+	Version *int `json:"version,omitempty" yaml:"version,omitempty" mapstructure:"version,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *UpgradePlannerUpgradePlanner) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain UpgradePlannerUpgradePlanner
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["label"]; !ok || v == nil {
+		plain.Label = ""
+	}
+	*j = UpgradePlannerUpgradePlanner(plain)
+	return nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (j *UpgradePlannerUpgradePlanner) UnmarshalYAML(value *yaml.Node) error {
+	var raw map[string]interface{}
+	if err := value.Decode(&raw); err != nil {
+		return err
+	}
+	type Plain UpgradePlannerUpgradePlanner
+	var plain Plain
+	if err := value.Decode(&plain); err != nil {
+		return err
+	}
+	if v, ok := raw["label"]; !ok || v == nil {
+		plain.Label = ""
+	}
+	*j = UpgradePlannerUpgradePlanner(plain)
+	return nil
+}
+
+type UpgradePlanner struct {
+	// Index corresponds to the JSON schema field "index".
+	Index *int `json:"index,omitempty" yaml:"index,omitempty" mapstructure:"index,omitempty"`
+
+	// UpgradePlanner corresponds to the JSON schema field "upgrade_planner".
+	UpgradePlanner *UpgradePlannerUpgradePlanner `json:"upgrade_planner,omitempty" yaml:"upgrade_planner,omitempty" mapstructure:"upgrade_planner,omitempty"`
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SignalIDType) UnmarshalJSON(b []byte) error {
 	var v string
@@ -1475,56 +2243,13 @@ func (j *SignalIDType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *BlueprintBook) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["blueprints"]; !ok || v == nil {
-		return fmt.Errorf("field blueprints in BlueprintBook: required")
-	}
-	if v, ok := raw["item"]; !ok || v == nil {
-		return fmt.Errorf("field item in BlueprintBook: required")
-	}
-	if v, ok := raw["version"]; !ok || v == nil {
-		return fmt.Errorf("field version in BlueprintBook: required")
-	}
-	type Plain BlueprintBook
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = BlueprintBook(plain)
-	return nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (j *BlueprintBook) UnmarshalYAML(value *yaml.Node) error {
-	var raw map[string]interface{}
-	if err := value.Decode(&raw); err != nil {
-		return err
-	}
-	if v, ok := raw["blueprints"]; !ok || v == nil {
-		return fmt.Errorf("field blueprints in BlueprintBook: required")
-	}
-	if v, ok := raw["item"]; !ok || v == nil {
-		return fmt.Errorf("field item in BlueprintBook: required")
-	}
-	if v, ok := raw["version"]; !ok || v == nil {
-		return fmt.Errorf("field version in BlueprintBook: required")
-	}
-	type Plain BlueprintBook
-	var plain Plain
-	if err := value.Decode(&plain); err != nil {
-		return err
-	}
-	*j = BlueprintBook(plain)
-	return nil
-}
-
 var enumValues_SignalIDType = []interface{}{
 	"item",
 	"fluid",
 	"virtual",
+	"recipe",
+	"entity",
+	"space-location",
+	"asteroid-chunk",
+	"quality",
 }

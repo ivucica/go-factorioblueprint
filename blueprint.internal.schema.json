@@ -68,8 +68,102 @@
       "required": ["item", "entities", "icons", "version"]
     },
     "blueprint-book": {
+      "oneOf": [
+        { "$ref": "#/definitions/blueprint-book-v1" },
+        { "$ref": "#/definitions/blueprint-book-v2" }
+      ]
+    },
+    "deconstructionPlanner": {
       "type": "object",
-      "description": "An object representing a Factorio blueprint book.",
+      "properties": {
+        "index": { "type": ["integer", "null"] },
+        "deconstruction_planner": {
+          "type": "object",
+          "properties": {
+            "item": { "const": "deconstruction-planner" },
+            "label": { "type": "string", "default": "" },
+            "label_color": { "$ref": "#/definitions/color" },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "description": { "type": "string", "default": "" },
+                "icons": { "array": { "$ref": "#/definitions/icon" }, "maxItems": 4 },
+                "entity_filter_mode": { "type": "string" },
+                "entity_filters": { "type": "array" },
+                "trees_and_rocks_only": { "type": "boolean", "default": false },
+                "tile_filter_mode": { "type": "string" },
+                "tile_filters": { "type": "array" },
+                "tile_selection_mode": { "type": "integer", "default": 0 }
+              }
+            },
+            "version": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "upgradePlanner": {
+      "type": "object",
+      "properties": {
+        "index": { "type": ["integer", "null"] },
+        "upgrade_planner": {
+          "type": "object",
+          "properties": {
+            "item": { "const": "blueprint" },
+            "label": { "type": "string", "default": "" },
+            "label_color": { "$ref": "#/definitions/color" },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "description": { "type": "string", "default": "" },
+                "icons": { "type": "array", "items": { "$ref": "#/definitions/icon" }, "maxItems": 4 },
+                "mappers": { "type": "array", "items": { "$ref": "#/definitions/mapper" } }
+              }
+            },
+            "version": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "insertPlan": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/itemAndQualityId" },
+        "items": { "$ref": "#/definitions/itemInventoryPositions" }
+      },
+      "required": ["id", "items"]
+    },
+    "itemAndQualityId": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "quality": { "$ref": "#/definitions/qualityName" }
+      },
+      "required": ["name"]
+    },
+    "itemInventoryPositions": {
+      "type": "object",
+      "properties": {
+        "in_inventory": { "type": "array", "items": { "$ref": "#/definitions/inventoryPosition" } },
+        "grid_count": { "type": "integer", "default": 0 }
+      },
+      "default": {}
+    },
+    "inventoryPosition": {
+      "type": "object",
+      "properties": {
+        "inventory": { "type": "integer" },
+        "stack": { "type": "integer" },
+        "count": { "type": "integer", "default": 1 }
+      },
+      "required": ["inventory", "stack"]
+    },
+    "qualityName": {
+      "type": "string"
+    },
+
+    "blueprint-book-v1": {
+      "type": "object",
+      "description": "An object representing a Factorio blueprint book. (Legacy Factorio 1.x blueprint book structure.)",
       "properties": {
         "item": {
           "type": "string",
@@ -123,6 +217,39 @@
       },
       "required": ["item", "blueprints", "version"]
     },
+    "blueprint-book-v2": {
+      "type": "object",
+      "description": "Factorio 2.0 blueprint book structure (wrapped).",
+      "properties": {
+        "index": { "type": ["integer", "null"] },
+        "blueprint_book": { "$ref": "#/definitions/blueprint-book-content" }
+      },
+      "required": ["blueprint_book"]
+    },
+    "blueprint-book-content": {
+      "type": "object",
+      "properties": {
+        "item": { "type": "string", "const": "blueprint-book" },
+        "label": { "type": "string", "default": "" },
+        "label_color": { "$ref": "#/definitions/color" },
+        "description": { "type": "string", "default": "" },
+        "icons": { "type": "array", "items": { "$ref": "#/definitions/icon" }, "maxItems": 4 },
+        "version": { "type": "integer" },
+        "active_index": { "type": "integer", "default": 0 },
+        "blueprints": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/blueprint" },
+              { "$ref": "#/definitions/deconstructionPlanner" },
+              { "$ref": "#/definitions/upgradePlanner" },
+              { "$ref": "#/definitions/blueprint-book-content" }
+            ]
+          }
+        }
+      },
+      "required": ["item", "blueprints", "version"]
+    },
     "icon": {
       "type": "object",
       "description": "An icon representing an item, fluid, or virtual signal.",
@@ -149,8 +276,12 @@
         },
         "type": {
           "type": "string",
-          "enum": ["item", "fluid", "virtual"],
-          "description": "The type of the signal."
+          "enum": ["item", "fluid", "virtual", "recipe", "entity", "space-location", "asteroid-chunk", "quality"],
+          "description": "The type of the signal (expanded for Factorio 2.0)."
+        },
+        "quality": {
+          "type": "string",
+          "description": "The quality associated with this signal (Factorio 2.0)."
         }
       },
       "required": ["name"]
@@ -174,13 +305,31 @@
         },
         "direction": {
           "type": "integer",
-          "description": "Direction of the entity, uint (optional)."
+          "description": "Direction of the entity (0-15 for Factorio 2.0).",
+          "oneOf": [
+            { "type": "integer" },
+            { "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }
+          ]
         },
         "orientation": {
           "type": "number",
           "description": "Orientation of cargo wagon or locomotive, value 0 to 1 (optional).",
           "minimum": 0,
           "maximum": 1
+        },
+        "mirror": {
+          "type": "boolean",
+          "description": "(Factorio 2.0) Whether or not the input/output fluid boxes are mirrored.",
+          "default": false
+        },
+        "quality": {
+          "type": "string",
+          "description": "(Factorio 2.0) The quality of the entity.",
+          "default": "normal"
+        },
+        "tags": {
+          "type": "object",
+          "description": "(Factorio 2.0) Metadata tags for the entity."
         },
         "connections": {
           "$ref": "#/definitions/connection",
@@ -196,7 +345,10 @@
           "description": "Control behavior of this entity (optional)."
         },
         "items": {
-          "$ref": "#/definitions/itemRequest",
+          "oneOf": [
+            { "$ref": "#/definitions/itemRequest", "description": "Legacy item requests (map of string to integer)." },
+            { "$ref": "#/definitions/insertPlan", "description": "(Factorio 2.0) Array of insert plans." }
+          ],
           "description": "Item requests by this entity (optional)."
         },
         "recipe": {
@@ -819,6 +971,70 @@
         }
       },
       "required": ["index", "name", "comparator", "count"]
+    },
+
+    "mapper-id-name": {
+        "title": "Name",
+        "description": "Name of a valid Factorio entity/item.",
+        "type": "string"
+    },
+    "mapper-id-type": {
+        "title": "Type",
+        "description": "Either 'entity' or 'item'.",
+        "enum": ["entity", "item"]
+    },
+    "from-mapper-id": {
+        "title": "From Mapper ID",
+        "type": "object",
+        "properties": {
+            "name": {"$ref": "#/definitions/mapper-id-name"},
+            "type": {"$ref": "#/definitions/mapper-id-type"},
+            "quality": {
+              "type": "string",
+              "description": "The prototype name of the quality. nil for any quality."
+            },
+            "comparator": {
+              "type": "string",
+              "description": "The comparator for quality. nil if any quality."
+            }
+        }
+    },
+    "to-mapper-id": {
+        "title": "To Mapper ID",
+        "type": "object",
+        "properties": {
+            "name": {"$ref": "#/definitions/mapper-id-name"},
+            "type": {"$ref": "#/definitions/mapper-id-type"},
+            "quality": {"type": "string", "title": "Quality", "description": "(Factorio 2.0) Quality"}
+        }
+    },
+    "mapper": {
+        "title": "Mapper",
+        "type": "object",
+        "properties": {
+            "index": {
+                "title": "Index",
+                "description": "Index of this particular mapper pair in the upgrade planner GUI, 1-indexed.",
+                "type": "integer"
+            },
+            "from": {
+                "title": "From",
+                "description": "Entity/item being converted from.",
+                "oneOf": [
+                    {"$ref": "#/definitions/from-mapper-id"},
+                    {"title": "null", "type": "null"}
+                ]
+            },
+            "to": {
+                "title": "To",
+                "description": "Entity/item being converted to.",
+                "oneOf": [
+                    {"$ref": "#/definitions/to-mapper-id"},
+                    {"title": "null", "type": "null"}
+                ]
+            }
+        }
     }
+
   }
 }
