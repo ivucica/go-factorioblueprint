@@ -49,10 +49,13 @@ func (b *blueprintEncoder) Flush() error {
 	return nil
 }
 
+// Flusher interface defines a method to request that the writer flushes the writes to the output immediately.
 type Flusher interface {
+	// Flush requests flushing the encoded data to the output.
 	Flush() error
 }
 
+// WriteCloseFlusher combines an [io.WriteCloser] and a [Flusher].
 type WriteCloseFlusher interface {
 	io.WriteCloser
 	Flusher
@@ -64,11 +67,12 @@ type WriteCloseFlusher interface {
 // The passed byte data will be first compressed using zlib, then base64
 // encoded. The version byte is prepended to the data.
 //
-// You need to finalize the data via Flush or Close if you want to read the
-// zlib-encoded data correctly -- otherwise you will read only '0' (the version
-// prefix rune / byte), even if you otherwise do not close or flush the writer.
+// You need to finalize the data via [Flusher.Flush] or [io.WriteCloser.Close] if
+// you want to read the zlib-encoded data correctly -- otherwise you will read only
+// '0' (the version prefix rune / byte), even if you otherwise do not close or flush
+// the writer.
 //
-// Close is more likely to work; please use it unless you really can't do
+// [io.WriteCloser.Close] is more likely to work; please use it unless you really can't do
 // without it. Encode->Decode tests did not work when Flush was used.
 func AsStringWriter(w io.Writer) WriteCloseFlusher {
 	// The actual wrapping is done in the blueprintEncoder's Writer.
