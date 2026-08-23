@@ -5,7 +5,7 @@ package factorioblueprint
 
 // Declare tools we will use.
 //
-// Use with cat tools.go | grep _ | awk -F'"' '{print $2}' | xargs -tI % go install %
+// Use with cat tools.go | grep -P '^\t_' | awk -F'"' '{print $2}' | xargs -tI % go install %
 //
 // See https://marcofranssen.nl/manage-go-tools-via-go-modules
 import (
