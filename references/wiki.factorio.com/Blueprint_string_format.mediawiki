@@ -1,12 +1,14 @@
 {{Cleanup|Needs to be updated for 2.0}}
 [[File:blueprint_string_preview.png|thumb|340px|right|Preview of a blueprint string.]]This is a technical description of the blueprint string format, used to share blueprints with other users.
 
-A blueprint string is a JSON representation of the blueprint, compressed with zlib deflate using compression level 9 and then encoded using base64 with a version byte in front of the encoded string. The version byte is currently 0 (for all Factorio versions through 1.1).
+A blueprint string is a JSON representation of the blueprint, compressed with zlib deflate using compression level 9 and then encoded using base64 with a version byte in front of the encoded string. The version byte is currently 0 (for all Factorio versions through 2.0).
 So to get the JSON representation of a blueprint from a blueprint string, skip the first byte, base64 decode the string, and finally decompress using zlib inflate.
+
+As of 2.0 the game can also import the uncompressed JSON blueprint string directly.
 
 == Json representation of a blueprint/blueprint book ==
 
-The json representation of a blueprint or blueprint book is one large object inside another "wrapping" object, its key inside that object is either blueprint or blueprint-book.
+The json representation of a blueprint or blueprint book is one large object inside another "wrapping" object, its key inside that object is either blueprint or blueprint_book.
 
 === Blueprint book object ===
 
@@ -14,7 +16,7 @@ The json representation of a blueprint or blueprint book is one large object ins
 ! Key !! Description !! Data type
 |-
 | item
-| String, the name of the item that was saved ("blueprint-book" in vanilla).
+| String, the name of the item that was saved ("blueprint-book" in vanilla). Note that the key within the wrapping object is "blueprint_book" (with an underscore).
 | String
 |-
 | label
@@ -428,7 +430,7 @@ Value is the amount of items to be requested, [[Types/ItemCountType]].
 | String
 |-
 | index
-| Index of the filter, 1-based. 
+| Index of the filter, 1-based.
 | Integer
 |}
 
@@ -549,7 +551,7 @@ Value is the amount of items to be requested, [[Types/ItemCountType]].
 
 {| class="wikitable"
 |-
-! Key !! Description !! Data type 
+! Key !! Description !! Data type
 |-
 | logistic_condition
 | [https://lua-api.factorio.com/latest/concepts/CircuitCondition.html CircuitCondition]
@@ -668,7 +670,7 @@ Value is the amount of items to be requested, [[Types/ItemCountType]].
 | Integer
 |-
 | circuit_mode_of_operation
-| 
+|
 | Integer
 |-
 | circuit_hand_read_mode
@@ -732,15 +734,15 @@ How to decode a string to Lua table:
 local str="$blueprint_string";
 
 local bp_to_table=function(instr)
-  
+
   --[[version and the body part]]
   local version=string.sub(instr,1,1);
   local body=string.sub(instr,2);
   --[[then decode it]]
-  local json_str=game.decode_string(body);
+  local json_str=helpers.decode_string(body);
   --[[then turn it into table]]
-  local output=game.json_to_table(json_str);
-  
+  local output=helpers.json_to_table(json_str);
+
   return output;
 end
 
