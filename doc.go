@@ -6,6 +6,9 @@
 // Using an older version of some modules so that Go 1.19 can be used (shipping
 // in Debian etc).
 //
+// NOTE: Switched to 1.21 solely so to avoid needing to triage why 1.21 is being
+// pulled in.
+//
 // Usage
 //
 // Obtain and install the binary for the basic reader:
@@ -21,4 +24,5 @@
 //     $ blueprintread -fmt=raw_json -file read_blueprint/simple.txt
 //     $ blueprintread -fmt=yaml -file read_blueprint/simple.txt
 //
+// README BUG: Above should be bash codeblocks, but goreadme always uses Go.
 package factorioblueprint // badc0de.net/pkg/factorioblueprint
